@@ -78,7 +78,7 @@
   {
     
     $image = "";
-    if(!empty($_FILES['image']['name']) && $_FILES['image']['error'] == 0) {
+    if(!empty($_FILES['image']['name']) && $_FILES['image']['error'] == 0 && $_FILES['image']['type'] == 0) {
       // file was uploaded
       $folder = "uploads/";
       if(!file_exists($folder)){
@@ -115,7 +115,22 @@
   <?php require "header.php"; ?>
     <div style="margin: auto; max-width: 600px;">
 
-      <?php if(!empty($_GET['action']) && $_GET['action'] == 'edit'):?>
+      <?php if(!empty($_GET['action']) && $_GET['action'] == 'post_edit'):?>
+        <?php
+
+        ?>
+
+        <h5>Edit a post</h5>
+        <form method="post" enctype="multipart/form-data" style="margin: auto; pading: 10px;">
+
+          <img src="<?= $row['image'];?>" style="width: 100%;height:200px; object-fit:cover;"><br>
+          <input type="file" name="image">
+          <textarea name="post" rows="8"></textarea><br>
+          <input type="hidden" name="action" value="pos_edit">
+
+          <button>Post</button>
+        </form>
+      <?php elseif(!empty($_GET['action']) && $_GET['action'] == 'edit'):?>
         <h2 style="text-align: center;">Edit Profile</h2>
           <form method="post" enctype="multipart/form-data" style="margin: auto; pading: 10px;">
 
@@ -224,6 +239,15 @@
                       ?>
                     </div>
                       <?php echo $row['post'];?>
+                      <br><br>
+                      <a href="profile.php?action=post_edit&id=<?= $row['id']?>">
+                        <button>Edit</button>
+                      </a>
+
+                      <a href="profile.php?action=post_delete&id=<?= $row['id']?>">
+                        <button>Delete</button>
+                      </a>
+                      <br><br>
                     </div>
                   </div>
                 </div>
