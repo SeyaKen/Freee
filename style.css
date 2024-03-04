@@ -4,13 +4,6 @@
   box-sizing: border-box;
 }
 
-
-
-.wrapper{
-  min-height: 100vh;
-  position: relative;/*←相対位置*/
-}
-
 a {
   text-decoration: none;
 }
@@ -20,19 +13,16 @@ body {
 }
 
 .side-bar div {
-  padding: 20px;
+  padding: 12px;
 }
 
 .side-bar a {
-  color: white;
+  color: #060606;
 }
 
 .side-bar {
-  background-color: #00AEEF;
-  display: flex;
-  color: white;
-  justify-content: center;
-  align-items: center;
+  background-color: #fff;
+  padding: 12px;
 }
 
 footer{
