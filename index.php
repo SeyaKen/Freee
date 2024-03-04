@@ -56,7 +56,9 @@ error_reporting(E_ALL);
                     // date("Y/M/D",strtotime($row['date']));
                   ?>
                 </div>
-                <?php echo $row['post'];?>
+                <!-- nl2brは<br>を反映してくれる（1行じゃなくて改行が適応される） -->
+                <!-- htmlspecialcharsはコードがうま込まれてもただの文字として認識する -->
+                <?php echo nl2br(htmlspecialchars($row['post']));?>
               </div>
             </div>
           </div>

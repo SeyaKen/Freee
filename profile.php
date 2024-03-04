@@ -6,8 +6,80 @@
   error_reporting(E_ALL);
   
   check_login();
-  if($_SERVER['REQUEST_METHOD'] == "POST" && !empty($_POST['action']) && $_POST['action'] == 'delete') {
+  // 👇投稿を削除する処理
+  if($_SERVER['REQUEST_METHOD'] == "POST" && !empty($_POST['action']) && $_POST['action'] == 'post_delete') {
     // Profileのデータを消す処理
+    $id = $_GET['id'] ?? 0;
+    // $_GET['id']がなかったら0を代入
+    $user_id = $_SESSION['info']['id'];
+
+    $query = "select * from posts where id = '$id' && user_id = '$user_id' limit 1";
+    $result = mysqli_query($con, $query);
+    if(mysqli_num_rows($result) > 0){
+
+      $row = mysqli_fetch_assoc($result);
+      // 👇投稿を消すときに写真も消す処理
+      if(file_exists($row['image'])){
+      unlink($row['image']);
+      }
+    }
+    
+    $query = "delete from posts where id = '$id' && user_id = '$user_id' limit 1";
+    $result = mysqli_query($con, $query);
+
+    header("Location: profile.php");
+    die;
+  }
+  // 👇投稿を編集する処理
+  elseif($_SERVER['REQUEST_METHOD'] == "POST" && !empty($_POST['action'] == "post_edit"))
+  {
+    $id = $_GET['id'] ?? 0;
+    // $_GET['id']がなかったら0を代入
+    $user_id = $_SESSION['info']['id'];
+    $image_added = false;
+    // 👇画像がある場合
+    if(!empty($_FILES['image']['name']) && $_FILES['image']['error'] == 0) {
+      // file was uploaded
+      $folder = "uploads/";
+      if(!file_exists($folder)){
+        
+        mkdir($folder, 0777, true);
+      }
+      $image = $folder . $_FILES['image']['name'];
+      move_uploaded_file($_FILES['image']['tmp_name'], $image);
+
+      $query = "select * from posts where id = '$id' && user_id = '$user_id' limit 1";
+        $result = mysqli_query($con, $query);
+        if(mysqli_num_rows($result) > 0){
+
+          $row = mysqli_fetch_assoc($result);
+          // 👇投稿を編集するときに前の写真を消す処理
+          if(file_exists($row['image'])){
+            unlink($row['image']);
+          }
+        }
+
+      $image_added = true;
+
+      }
+      
+      $post = addslashes($_POST['post']);
+      // addslashedは自動で\を追加してくれる
+      // \はKen's Breadなどの「'」を文字列として認識するためのもの
+
+      if($image_added == true) {
+        $query = "update posts set post = '$post', image = '$image' where id = '$id' && user_id = '$user_id' limit 1 ";
+      } else {
+        $query = "update posts set post = '$post' where id = '$id && user_id = '$user_id' limit 1 ";
+      }
+
+      $result = mysqli_query($con, $query);
+
+      header("Location: profile.php");
+      die;
+    }
+    // 👇プロフィールを削除（退会）する処理
+    elseif($_SERVER['REQUEST_METHOD'] == "POST" && !empty($_POST['action']) && $_POST['action'] == 'delete') {
     $id = $_SESSION['info']['id'];
     $query = "delete from users where id = '$id' limit 1";
     $result = mysqli_query($con, $query);
@@ -24,6 +96,7 @@
     header("Location: logout.php");
     die;
   }
+  // 👇プロフィールを登録する処理
   elseif($_SERVER['REQUEST_METHOD'] == "POST" && !empty($_POST['username']))
   {
     $image_added = false;
@@ -115,21 +188,62 @@
   <?php require "header.php"; ?>
     <div style="margin: auto; max-width: 600px;">
 
-      <?php if(!empty($_GET['action']) && $_GET['action'] == 'post_edit'):?>
+      <!-- 👇投稿を削除する処理 -->
+      <?php if(!empty($_GET['action']) && $_GET['action'] == 'post_delete' && !empty($_GET['id'])):?>
         <?php
-
+          $id = (int)$_GET['id'];
+          // 文字列をint型として変換
+          $query = "select * from posts where id = '$id' limit 1";
+          $result = mysqli_query($con, $query);
+          
         ?>
 
-        <h5>Edit a post</h5>
-        <form method="post" enctype="multipart/form-data" style="margin: auto; pading: 10px;">
+        <?php if(mysqli_num_rows($result) > 0): ?>
+          <?php $row = mysqli_fetch_assoc($result); ?>
+          <h3>Are you sure you want to delete?</h3>
+          <form method="post" enctype="multipart/form-data" style="margin: auto; pading: 10px;">
+            <?php if(!empty($row['image'])): ?>
+            <img src="<?= $row['image'];?>" style="width: 100%;height:200px; object-fit:cover;"><br>
+            <?php endif; ?>
+            <div><?php $row['post'];?></div><br>
+            <input type="hidden" name="action" value="post_delete">
 
-          <img src="<?= $row['image'];?>" style="width: 100%;height:200px; object-fit:cover;"><br>
-          <input type="file" name="image">
-          <textarea name="post" rows="8"></textarea><br>
-          <input type="hidden" name="action" value="pos_edit">
+            <button>Delete</button>
+            <a href="profile.php">
+              <button type="button">Cancel</button>
+            </a>
+          </form>
+        <?php endif; ?>
 
-          <button>Post</button>
-        </form>
+      <!-- 👇投稿を編集する処理 -->
+      <?php elseif(!empty($_GET['action']) && $_GET['action'] == 'post_edit' && !empty($_GET['id'])):?>
+        <?php
+          $id = (int)$_GET['id'];
+          // 文字列をint型として変換
+          $query = "select * from posts where id = '$id' limit 1";
+          $result = mysqli_query($con, $query);
+          
+        ?>
+
+        <?php if(mysqli_num_rows($result) > 0): ?>
+          <?php $row = mysqli_fetch_assoc($result); ?>
+          <h5>Edit a post</h5>
+          <form method="post" enctype="multipart/form-data" style="margin: auto; pading: 10px;">
+            <?php if(!empty($row['image'])): ?>
+            <img src="<?= $row['image'];?>" style="width: 100%;height:200px; object-fit:cover;"><br>
+            <?php endif; ?>
+            <input type="file" name="image">
+            <textarea name="post" rows="8"><?php $row['post'];?></textarea><br>
+            <input type="hidden" name="action" value="post_edit">
+
+            <button>Save</button>
+            <a href="profile.php">
+              <button type="button">Cancel</button>
+            </a>
+          </form>
+        <?php endif; ?>
+
+      <!-- 👇プロフィールを編集する処理 -->
       <?php elseif(!empty($_GET['action']) && $_GET['action'] == 'edit'):?>
         <h2 style="text-align: center;">Edit Profile</h2>
           <form method="post" enctype="multipart/form-data" style="margin: auto; pading: 10px;">
@@ -238,12 +352,15 @@
                         // date("Y/M/D",strtotime($row['date']));
                       ?>
                     </div>
-                      <?php echo $row['post'];?>
+                      <!-- nl2brは<br>を反映してくれる（1行じゃなくて改行が適応される） -->
+                      <!-- htmlspecialcharsはコードがうま込まれてもただの文字として認識する -->
+                      <?php echo nl2br(htmlspecialchars($row['post']));?>
                       <br><br>
                       <a href="profile.php?action=post_edit&id=<?= $row['id']?>">
                         <button>Edit</button>
                       </a>
 
+                      <!-- 👇ここで$_GETにidが登録される -->
                       <a href="profile.php?action=post_delete&id=<?= $row['id']?>">
                         <button>Delete</button>
                       </a>

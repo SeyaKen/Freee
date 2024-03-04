@@ -24,8 +24,9 @@
       // ログインできた時の処理
       $row = mysqli_fetch_assoc($result);
       // $rowの中身は連想配列(key: value)
+      // 👇$_SESSIONに入れることでどのページでも使える値になる
       $_SESSION['info'] = $row;
-      // $_SESSIONに入れることでどのページでも使える値になる
+      
 
       header("Location: profile.php");
       die;
