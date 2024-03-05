@@ -28,7 +28,7 @@
       $_SESSION['info'] = $row;
       
 
-      header("Location: profile.php");
+      header("Location: kintai.php");
       die;
     } else {
       // ログインに失敗した時の処理

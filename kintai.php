@@ -5,78 +5,84 @@
   ini_set('display_errors', 1);
   error_reporting(E_ALL);
   
+  date_default_timezone_set ('Asia/Tokyo');
+
   check_login();
-  // 👇投稿を削除する処理
-  if($_SERVER['REQUEST_METHOD'] == "POST" && !empty($_POST['action']) && $_POST['action'] == 'post_delete') {
-    // Profileのデータを消す処理
-    $id = $_GET['id'] ?? 0;
-    // $_GET['id']がなかったら0を代入
-    $user_id = $_SESSION['info']['id'];
 
-    $query = "select * from posts where id = '$id' && user_id = '$user_id' limit 1";
-    $result = mysqli_query($con, $query);
-    if(mysqli_num_rows($result) > 0){
-
-      $row = mysqli_fetch_assoc($result);
-      // 👇投稿を消すときに写真も消す処理
-      if(file_exists($row['image'])){
-      unlink($row['image']);
-      }
-    }
+  // 👇出勤を入力する処理
+  if($_SERVER['REQUEST_METHOD'] == "POST" && !empty($_POST['action']) && $_POST['action'] == 'shukkin') {
     
-    $query = "delete from posts where id = '$id' && user_id = '$user_id' limit 1";
-    $result = mysqli_query($con, $query);
-
-    header("Location: profile.php");
-    die;
-  }
-  // 👇投稿を編集する処理
-  elseif($_SERVER['REQUEST_METHOD'] == "POST" && !empty($_POST['action'] == "post_edit"))
-  {
-    $id = $_GET['id'] ?? 0;
-    // $_GET['id']がなかったら0を代入
-    $user_id = $_SESSION['info']['id'];
-    $image_added = false;
-    // 👇画像がある場合
-    if(!empty($_FILES['image']['name']) && $_FILES['image']['error'] == 0) {
-      // file was uploaded
-      $folder = "uploads/";
-      if(!file_exists($folder)){
-        
-        mkdir($folder, 0777, true);
-      }
-      $image = $folder . $_FILES['image']['name'];
-      move_uploaded_file($_FILES['image']['tmp_name'], $image);
-
-      $query = "select * from posts where id = '$id' && user_id = '$user_id' limit 1";
-        $result = mysqli_query($con, $query);
-        if(mysqli_num_rows($result) > 0){
-
-          $row = mysqli_fetch_assoc($result);
-          // 👇投稿を編集するときに前の写真を消す処理
-          if(file_exists($row['image'])){
-            unlink($row['image']);
-          }
-        }
-
-      $image_added = true;
-
-      }
-      
-      $post = addslashes($_POST['post']);
-      // addslashedは自動で\を追加してくれる
-      // \はKen's Breadなどの「'」を文字列として認識するためのもの
-
-      if($image_added == true) {
-        $query = "update posts set post = '$post', image = '$image' where id = '$id' && user_id = '$user_id' limit 1 ";
-      } else {
-        $query = "update posts set post = '$post' where id = '$id && user_id = '$user_id' limit 1 ";
-      }
+      $user_id = $_SESSION['info']['id'];
+      $name = $_SESSION['info']['username'];
+      $time = $_POST['time'];
+      // echo $id.$name.$time;die;
+      $query = "insert into kintai (user_id, kintai, name, time) value ('$user_id', 1, '$name', '$time') ";
 
       $result = mysqli_query($con, $query);
 
-      header("Location: profile.php");
+      $query = "select * from kintai where time = '$time' && user_id = '$user_id' limit 1";
+      $result = mysqli_query($con, $query);
+
+      if(mysqli_num_rows($result) > 0) {
+        $_SESSION['kintai']  = mysqli_fetch_assoc($result);
+      }
+
+      if (!$result) {
+        die("エラー: " . mysqli_error($con));
+      }
+
+      header("Location: kintai.php");
       die;
+    }
+    // 👇退勤を入力する処理
+    elseif($_SERVER['REQUEST_METHOD'] == "POST" && !empty($_POST['action']) && $_POST['action'] == 'taikin') {
+    
+    $_SESSION['kintai']['kintai'] = 0;
+    $id = $_SESSION['kintai']['id'];
+    $user_id = $_SESSION['kintai']['user_id'];
+    $name = $_SESSION['kintai']['name'];
+    $time = $_POST['time'];
+    // $time = "2024-03-06 11:13:20";
+
+    $roudouhun;
+    $kyuuryou;
+    // 日付が変わっているかどうか
+    if(substr($time, 8, 2) == substr($_SESSION['kintai']['kintai'], 8, 2)) {
+      $Date = date("Y-m-d");
+      // $InTime = $Date."01:00:00";
+      $InTime = $Date.substr($_SESSION['kintai']['time'], 11, 8);
+      $OutTime = $Date.substr($time, 11, 8);
+      $roudouhun = int((strtotime($OutTime) - strtotime($InTime))/60);
+      $kyuuryou = floor($roudouhun * 1113/60);
+    } else {
+      $Date1 = date('Y-m-d', strtotime('-1 day'));
+      $Date2 = date("Y-m-d");
+      // $InTime = $Date1."21:00:00";
+      $InTime = $Date1.substr($_SESSION['kintai']['time'], 11, 8);
+      $OutTime = $Date2.substr($time, 11, 8);
+      $roudouhun = floor((strtotime($OutTime) - strtotime($InTime))/60);
+      $kyuuryou = floor($roudouhun * 1113/60);
+    }
+
+    // 給料とその月の合計労働時間をkyuuroujikanテーブルに入れる処理
+    $query = "insert into kyuuryoujikan (user_id, time, kyuuryou, name) value ('$user_id', '$roudouhun', '$kyuuryou', '$name') ";
+    $result = mysqli_query($con, $query);
+    
+    
+    // //👇退勤の最終的な処理 
+    // $query = "update kintai set user_id = '$user_id', kintai = 0, name = '$name', time = '$time' where id = '$id' && user_id = '$user_id' limit 1";
+    // $result = mysqli_query($con, $query);
+    // // 👇kintaiのセッションを切る
+    // if(mysqli_num_rows($result) > 0) {
+    //   $_SESSION['kintai']  = mysqli_fetch_assoc($result);
+    // }
+
+    if (!$result) {
+      die("エラー: " . mysqli_error($con));
+    }
+
+    header("Location: kintai.php");
+    die;
     }
     // 👇プロフィールを削除（退会）する処理
     elseif($_SERVER['REQUEST_METHOD'] == "POST" && !empty($_POST['action']) && $_POST['action'] == 'delete') {
@@ -188,24 +194,48 @@
   
   <div style="display:flex">
   <?php require "header.php"; ?>
-    <div style="padding: 30px 20px 0;display: flex; align-items: center;margin: auto; max-width: 600px;">
-
-      <!-- 👇プロフィールを編集する処理 -->
-      <?php if(!empty($_GET['action']) && $_GET['action'] == 'edit'):?>
-        <h2 style="text-align: center;">Edit Profile</h2>
+    <div style="padding: 30px 20px 0; margin: auto; width: 300px;">
+      
+      <!-- 👇勤怠を記録する画面 -->
+      <?php if(!empty($_GET['action']) && $_GET['action'] == 'kintaigamen'):?>
+        <h2 style="text-align: center;">
+        <?php if(!empty($_SESSION['kintai']['kintai']) && $_SESSION['kintai']['kintai']){
+            echo "退勤する";
+          } else {
+            echo "出勤する";
+          }
+        ?>
+        </h2>
           <form method="post" enctype="multipart/form-data" style="margin: auto; pading: 10px;">
 
-            <img src="<?php echo $_SESSION['info']['image'] ?>" style="width: 100px; height: 100px;object-fit: cover;margin: auto; display: block">
-            <input value="<?php echo $_SESSION['info']['image'] ?>" type="file" name="image"><br>
-            <input value="<?php echo $_SESSION['info']['username'] ?>" type="text" name="username" placeholder="Username" required><br>
-            <input value="<?php echo $_SESSION['info']['email'] ?>" type="text" name="email" placeholder="Email" required><br>
-            <input value="<?php echo $_SESSION['info']['password'] ?>" type="text" name="password" placeholder="Password" required><br>
+            <input value="<?= $today = date("Y-m-d H:i:s");?>" type="text" name="time" placeholder="勤怠時間" required><br>
+            <input type="hidden" 
+                   name="action" 
+                   value=<?php if(!empty($_SESSION['kintai']['kintai']) && $_SESSION['kintai']['kintai']){
+                      echo "taikin";
+                    } else {
+                      echo "shukkin";
+                    }
+                  ?>>
 
-            <button>Save</button>
+            <div class="kintai-bottom-button">
+              <div>
+                <button>
+                  <?php if(!empty($_SESSION['kintai']['kintai']) && $_SESSION['kintai']['kintai']){
+                      echo "退勤する";
+                    } else {
+                      echo "出勤する";
+                    }
+                  ?>
+                </button>
+              </div>
 
-            <a href="profile.php">
-              <button type="button">Cancel</button>
-            </a>
+              <div>
+                <a class="button" href="kintai.php" style="padding: 10px 15px;width: 100px;">
+                  戻る
+                </a>
+              </div>
+            </div>
           </form>
 
       <?php elseif(!empty($_GET['action']) && $_GET['action'] == 'delete'):?>
@@ -220,7 +250,7 @@
               <input type="hidden" name="action" value="delete">
               <button>Delete</button>
 
-              <a href="profile.php">
+              <a href="kintai.php">
                 <button type="button">Cancel</button>
               </a>
             </form>
@@ -233,7 +263,7 @@
           </div>
           <div style="margin-left: 50px;">
             <p style="font-weight: 400; font-size: 25px;"><?php echo $_SESSION['info']['username'] ?></p>
-            <a href="profile.php?action=edit" style="padding: 10px 15px;">
+            <a href="kintai.php?action=kintaigamen" style="padding: 10px 15px;">
               <div class="button">
                 <p>勤怠</p>
               </div>
@@ -241,12 +271,6 @@
           </div>
 
         </div>
-<!-- 
-        <div>
-          <?= $today = date("Y-m-d H:i:s");?>
-        </div> -->
-
-        
 
         <?php endif;?>
       </div>

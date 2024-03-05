@@ -44,6 +44,33 @@ textarea {
   width: 100%;
 }
 
+.kintai-bottom-button {
+  display: flex;
+  justify-content: space-between;
+}
+
+.kintai-bottom-button button {
+  padding: 10px 15px;
+  width: 100px;
+  border: none;
+  background-color: #efefef !important;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 16px;
+  color: #060606;
+  text-align: center;
+  text-decoration: none;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.kintai-bottom-button button:hover {
+  background-color: #dbdbdb !important;
+}
+
 .button {
   background-color: #efefef !important;
   border-radius: 5px;
