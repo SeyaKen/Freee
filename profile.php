@@ -186,196 +186,131 @@
 </head>
 <body>
   
+<div class="main-content">
+
   <?php require "header.php"; ?>
-    <div style="margin: auto; max-width: 600px;">
 
-      <!-- 👇投稿を削除する処理 -->
-      <?php if(!empty($_GET['action']) && $_GET['action'] == 'post_delete' && !empty($_GET['id'])):?>
-        <?php
-          $id = (int)$_GET['id'];
-          // 文字列をint型として変換
-          $query = "select * from posts where id = '$id' limit 1";
-          $result = mysqli_query($con, $query);
-          
-        ?>
-
-        <?php if(mysqli_num_rows($result) > 0): ?>
-          <?php $row = mysqli_fetch_assoc($result); ?>
-          <h3>Are you sure you want to delete?</h3>
-          <form method="post" enctype="multipart/form-data" style="margin: auto; pading: 10px;">
-            <?php if(!empty($row['image'])): ?>
-            <img src="<?= $row['image'];?>" style="width: 100%;height:200px; object-fit:cover;"><br>
-            <?php endif; ?>
-            <div><?php $row['post'];?></div><br>
-            <input type="hidden" name="action" value="post_delete">
-
-            <button>Delete</button>
-            <a href="profile.php">
-              <button type="button">Cancel</button>
-            </a>
-          </form>
-        <?php endif; ?>
-
-      <!-- 👇投稿を編集する処理 -->
-      <?php elseif(!empty($_GET['action']) && $_GET['action'] == 'post_edit' && !empty($_GET['id'])):?>
-        <?php
-          $id = (int)$_GET['id'];
-          // 文字列をint型として変換
-          $query = "select * from posts where id = '$id' limit 1";
-          $result = mysqli_query($con, $query);
-          
-        ?>
-
-        <?php if(mysqli_num_rows($result) > 0): ?>
-          <?php $row = mysqli_fetch_assoc($result); ?>
-          <h5>Edit a post</h5>
-          <form method="post" enctype="multipart/form-data" style="margin: auto; pading: 10px;">
-            <?php if(!empty($row['image'])): ?>
-            <img src="<?= $row['image'];?>" style="width: 100%;height:200px; object-fit:cover;"><br>
-            <?php endif; ?>
-            <input type="file" name="image">
-            <textarea name="post" rows="8"><?php $row['post'];?></textarea><br>
-            <input type="hidden" name="action" value="post_edit">
-
-            <button>Save</button>
-            <a href="profile.php">
-              <button type="button">Cancel</button>
-            </a>
-          </form>
-        <?php endif; ?>
-
-      <!-- 👇プロフィールを編集する処理 -->
-      <?php elseif(!empty($_GET['action']) && $_GET['action'] == 'edit'):?>
-        <h2 style="text-align: center;">Edit Profile</h2>
-          <form method="post" enctype="multipart/form-data" style="margin: auto; pading: 10px;">
-
-            <img src="<?php echo $_SESSION['info']['image'] ?>" style="width: 100px; height: 100px;object-fit: cover;margin: auto; display: block">
-            <input value="<?php echo $_SESSION['info']['image'] ?>" type="file" name="image"><br>
-            <input value="<?php echo $_SESSION['info']['username'] ?>" type="text" name="username" placeholder="Username" required><br>
-            <input value="<?php echo $_SESSION['info']['email'] ?>" type="text" name="email" placeholder="Email" required><br>
-            <input value="<?php echo $_SESSION['info']['password'] ?>" type="text" name="password" placeholder="Password" required><br>
-
-            <button>Save</button>
-
-            <a href="profile.php">
-              <button type="button">Cancel</button>
-            </a>
-          </form>
-
-      <?php elseif(!empty($_GET['action']) && $_GET['action'] == 'delete'):?>
-        <h2 style="text-align: center;">Are you sure you want to delete your profile?</h2>
-          <div style="margin: auto; max-width: 600px;text-align: center;"> 
-            <form method="post" style="margin: auto; pading: 10px;">
-              <img src="<?php echo $_SESSION['info']['image'] ?>" style="width: 100px; height: 100px;object-fit: cover;margin: auto; display: block">
-              <div><?php echo $_SESSION['info']['username'] ?></div>
-              <div><?php echo $_SESSION['info']['email'] ?></div>
-
-              <!-- 👇ここで$_POST['action']にdeleteが追加？される -->
-              <input type="hidden" name="action" value="delete">
-              <button>Delete</button>
-
-              <a href="profile.php">
-                <button type="button">Cancel</button>
-              </a>
-            </form>
-          </div>
-      <?php else:?>
-      <h2 style="text-align: center;">User Profile</h2>
+  <!-- 👇投稿を削除する処理 -->
+  <?php if(!empty($_GET['action']) && $_GET['action'] == 'post_delete' && !empty($_GET['id'])):?>
+    <?php
+      $id = (int)$_GET['id'];
+      // 文字列をint型として変換
+      $query = "select * from posts where id = '$id' limit 1";
+      $result = mysqli_query($con, $query);
       
-        <br>
-        <div style="margin: auto; max-width: 600px;text-align: center;">
-          <div>
-            <td><img src="<?php echo $_SESSION['info']['image'] ?>" style="width: 150px; height: 150px;object-fit: cover;"></td>
-          </div>
-          <div>
-            <th>Username:</th><td><?php echo $_SESSION['info']['username'] ?></td>
-          </div>
-          <div>
-            <th>Email:</th><td><?php echo $_SESSION['info']['email'] ?></td>
-          </div>
+    ?>
 
-          <a href="profile.php?action=edit">
-            <button>Edit profile</button>
+    <?php if(mysqli_num_rows($result) > 0): ?>
+      <?php $row = mysqli_fetch_assoc($result); ?>
+      <h3>Are you sure you want to delete?</h3>
+      <form method="post" enctype="multipart/form-data" style="margin: auto; pading: 10px;">
+        <?php if(!empty($row['image'])): ?>
+        <img src="<?= $row['image'];?>" style="width: 100%;height:200px; object-fit:cover;"><br>
+        <?php endif; ?>
+        <div><?php $row['post'];?></div><br>
+        <input type="hidden" name="action" value="post_delete">
+
+        <button>Delete</button>
+        <a href="profile.php">
+          <button type="button">Cancel</button>
+        </a>
+      </form>
+    <?php endif; ?>
+
+  <!-- 👇投稿を編集する処理 -->
+  <?php elseif(!empty($_GET['action']) && $_GET['action'] == 'post_edit' && !empty($_GET['id'])):?>
+    <?php
+      $id = (int)$_GET['id'];
+      // 文字列をint型として変換
+      $query = "select * from posts where id = '$id' limit 1";
+      $result = mysqli_query($con, $query);
+      
+    ?>
+
+    <?php if(mysqli_num_rows($result) > 0): ?>
+      <?php $row = mysqli_fetch_assoc($result); ?>
+      <h5>Edit a post</h5>
+      <form method="post" enctype="multipart/form-data" style="margin: auto; pading: 10px;">
+        <?php if(!empty($row['image'])): ?>
+        <img src="<?= $row['image'];?>" style="width: 100%;height:200px; object-fit:cover;"><br>
+        <?php endif; ?>
+        <input type="file" name="image">
+        <textarea name="post" rows="8"><?php $row['post'];?></textarea><br>
+        <input type="hidden" name="action" value="post_edit">
+
+        <button>Save</button>
+        <a href="profile.php">
+          <button type="button">Cancel</button>
+        </a>
+      </form>
+    <?php endif; ?>
+
+  <!-- 👇プロフィールを編集する処理 -->
+  <?php elseif(!empty($_GET['action']) && $_GET['action'] == 'edit'):?>
+    <h2 style="text-align: center;">Edit Profile</h2>
+      <form method="post" enctype="multipart/form-data" style="margin: auto; pading: 10px;">
+
+        <img src="<?php echo $_SESSION['info']['image'] ?>" style="width: 100px; height: 100px;object-fit: cover;margin: auto; display: block">
+        <input value="<?php echo $_SESSION['info']['image'] ?>" type="file" name="image"><br>
+        <input value="<?php echo $_SESSION['info']['username'] ?>" type="text" name="username" placeholder="Username" required><br>
+        <input value="<?php echo $_SESSION['info']['email'] ?>" type="text" name="email" placeholder="Email" required><br>
+        <input value="<?php echo $_SESSION['info']['password'] ?>" type="text" name="password" placeholder="Password" required><br>
+
+        <button>Save</button>
+
+        <a href="profile.php">
+          <button type="button">Cancel</button>
+        </a>
+      </form>
+
+  <?php elseif(!empty($_GET['action']) && $_GET['action'] == 'delete'):?>
+    <h2 style="text-align: center;">Are you sure you want to delete your profile?</h2>
+      <div style="margin: auto; max-width: 600px;text-align: center;"> 
+        <form method="post" style="margin: auto; pading: 10px;">
+          <img src="<?php echo $_SESSION['info']['image'] ?>" style="width: 100px; height: 100px;object-fit: cover;margin: auto; display: block">
+          <div><?php echo $_SESSION['info']['username'] ?></div>
+          <div><?php echo $_SESSION['info']['email'] ?></div>
+
+          <!-- 👇ここで$_POST['action']にdeleteが追加？される -->
+          <input type="hidden" name="action" value="delete">
+          <button>Delete</button>
+
+          <a href="profile.php">
+            <button type="button">Cancel</button>
           </a>
-
-          <a href="profile.php?action=delete">
-            <button>Delete profile</button>
-          </a>
-
-        </div>
-        <br>
-        <hr>
-        <h5>Create a post</h5>
-        <form method="post" enctype="multipart/form-data" style="margin: auto; pading: 10px;">
-
-          <input type="file" name="image">
-          <textarea name="post" rows="8"></textarea><br>
-
-          <button>Post</button>
         </form>
-
-        <hr>
-
-        <!-- 👇投稿を表示するためのHTML -->
-        <div>
-            <?php 
-              $id = $_SESSION['info']['id'];
-              $query = "select * from posts where user_id = '$id' order by id desc";
-              $result = mysqli_query($con, $query);
-            ;?>
-            <?php if(mysqli_num_rows($result) > 0):?>
-              <?php while($row = mysqli_fetch_assoc($result)):?>
-                <?php
-                  $id = $row['user_id'];
-                  $query = "select username, image from users where id = '$id' limit 1";
-                  $result2 = mysqli_query($con, $query);
-
-                  $user_row = mysqli_fetch_assoc($result2);
-                ?>
-                <div style="background-color: #efefef;display:flex;border: solid thin #aaa;border-radius: 10px; margin-bottom: 10px;">
-                  <div style="flex: 1;text-align: center;">
-                    <img src="<?= $user_row['image'];?>" style="border-radius: 50%;margin:10px;width: 100px;height:100px; object-fit:cover;">
-                    <br>
-                    <?= $user_row['username'];?>
-                  </div>
-                  <div style="flex: 8;">
-                    <?php if(file_exists($row['image'])): ?>
-                    <div>
-                      <img src="<?= $row['image'];?>" style="width: 100%;height:200px; object-fit:cover;">
-                      <!-- 「＜？=」は「＜？php echo」と同じ -->
-                    </div>
-                    <?php endif;?>
-                    <div>
-                    <div style="color:#888;">
-                      <?php
-                        $week = array( "日", "月", "火", "水", "木", "金", "土" );
-                        echo date("m").'月'.date("d").'日'.'('.$week[date("w")].')';
-                        // date("Y/M/D",strtotime($row['date']));
-                      ?>
-                    </div>
-                      <!-- nl2brは<br>を反映してくれる（1行じゃなくて改行が適応される） -->
-                      <!-- htmlspecialcharsはコードがうま込まれてもただの文字として認識する -->
-                      <?php echo nl2br(htmlspecialchars($row['post']));?>
-                      <br><br>
-                      <a href="profile.php?action=post_edit&id=<?= $row['id']?>">
-                        <button>Edit</button>
-                      </a>
-
-                      <!-- 👇ここで$_GETにidが登録される -->
-                      <a href="profile.php?action=post_delete&id=<?= $row['id']?>">
-                        <button>Delete</button>
-                      </a>
-                      <br><br>
-                    </div>
-                  </div>
-                </div>
-              <?php endwhile;?> 
-            <?php endif;?>
-          
-        </div>
-
-        <?php endif;?>
       </div>
+  <?php elseif(!empty($_GET['action'])):?>
+    <?php
+      $id = $_GET['action'];
+      $query = "select * from users where id = '$id' limit 1";
+      $result2 = mysqli_query($con, $query);
+      $user_row = mysqli_fetch_assoc($result2);
+    ?>
+    <div style="margin: 0 auto; max-width: 600px;">
+    <h4 style="margin: 30px 0 20px 0;">プロフィール</h4>
+      <div>
+        <td><img src="<?php echo $user_row['image'] ?>" style="width: 150px; height: 150px;object-fit: cover;"></td>
+      </div>
+      <div>
+        <th>Username:</th><td><?php echo $user_row['username'] ?></td>
+      </div>
+      <div>
+        <th>Email:</th><td><?php echo $user_row['email'] ?></td>
+      </div>
+
+      <a href="profile.php?action=edit">
+        <button>Edit profile</button>
+      </a>
+
+      <a href="profile.php?action=delete">
+        <button>Delete profile</button>
+      </a>
+
+    </div>
+
+    <?php endif;?>
+  </div>
   <?php require "footer.php"; ?>
   
 </body>

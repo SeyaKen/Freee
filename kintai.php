@@ -41,41 +41,47 @@
     $id = $_SESSION['kintai']['id'];
     $user_id = $_SESSION['kintai']['user_id'];
     $name = $_SESSION['kintai']['name'];
+    $nyuukintime = $_SESSION['kintai']['time'];
     $time = $_POST['time'];
     // $time = "2024-03-06 11:13:20";
 
     $roudouhun;
     $kyuuryou;
+    $Date;
     // 日付が変わっているかどうか
-    if(substr($time, 8, 2) == substr($_SESSION['kintai']['kintai'], 8, 2)) {
+    if(substr($time, 8, 2) == substr($_SESSION['kintai']['time'], 8, 2)) {
+      
       $Date = date("Y-m-d");
       // $InTime = $Date."01:00:00";
       $InTime = $Date.substr($_SESSION['kintai']['time'], 11, 8);
       $OutTime = $Date.substr($time, 11, 8);
-      $roudouhun = int((strtotime($OutTime) - strtotime($InTime))/60);
+      $roudouhun = floor((strtotime($OutTime) - strtotime($InTime))/60);
       $kyuuryou = floor($roudouhun * 1113/60);
     } else {
-      $Date1 = date('Y-m-d', strtotime('-1 day'));
+      $Date = date('Y-m-d', strtotime('-1 day'));
       $Date2 = date("Y-m-d");
       // $InTime = $Date1."21:00:00";
-      $InTime = $Date1.substr($_SESSION['kintai']['time'], 11, 8);
+      $InTime = $Date.substr($_SESSION['kintai']['time'], 11, 8);
       $OutTime = $Date2.substr($time, 11, 8);
       $roudouhun = floor((strtotime($OutTime) - strtotime($InTime))/60);
       $kyuuryou = floor($roudouhun * 1113/60);
     }
 
     // 給料とその月の合計労働時間をkyuuroujikanテーブルに入れる処理
-    $query = "insert into kyuuryoujikan (user_id, time, kyuuryou, name) value ('$user_id', '$roudouhun', '$kyuuryou', '$name') ";
+    $query = "insert into kyuuryoujikan (user_id, time, kyuuryou, name, date) value ('$user_id', '$roudouhun', '$kyuuryou', '$name', '$Date') ";
     $result = mysqli_query($con, $query);
     
     
-    // //👇退勤の最終的な処理 
-    // $query = "update kintai set user_id = '$user_id', kintai = 0, name = '$name', time = '$time' where id = '$id' && user_id = '$user_id' limit 1";
-    // $result = mysqli_query($con, $query);
-    // // 👇kintaiのセッションを切る
-    // if(mysqli_num_rows($result) > 0) {
-    //   $_SESSION['kintai']  = mysqli_fetch_assoc($result);
-    // }
+    
+    //👇退勤の最終的な処理 
+    $query = "update kintai set user_id = '$user_id', kintai = 0, name = '$name', time = '$time' where id = '$id' && user_id = '$user_id' && time = '$nyuukintime' limit 1";
+    $result = mysqli_query($con, $query);
+    $query = "SELECT * FROM kintai WHERE id = '$id' && user_id = '$user_id' && time = '$nyuukintime' LIMIT 1";
+    $result = mysqli_query($con, $query);
+    // 👇kintaiのセッションを切る
+    if(mysqli_num_rows($result) > 0) {
+      $_SESSION['kintai']  = mysqli_fetch_assoc($result);
+    }
 
     if (!$result) {
       die("エラー: " . mysqli_error($con));
@@ -187,14 +193,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Profile - my website</title>
-  <link href="https://use.fontawesome.com/releases/v6.2.0/css/all.css" rel="stylesheet">
   <link href="style.css" rel="stylesheet" type="text/css">
+  <link href="https://use.fontawesome.com/releases/v6.2.0/css/all.css" rel="stylesheet">
 </head>
 <body>
   
   <div style="display:flex">
   <?php require "header.php"; ?>
-    <div style="padding: 30px 20px 0; margin: auto; width: 300px;">
+    <div style="padding: 30px 20px 0; margin: auto;">
       
       <!-- 👇勤怠を記録する画面 -->
       <?php if(!empty($_GET['action']) && $_GET['action'] == 'kintaigamen'):?>
@@ -257,9 +263,13 @@
           </div>
       <?php else:?>
       
-        <div style="height: 300px;display: flex;align-items: center;margin: auto; width: 900px;text-align: center;">
+        <div style="height: 300px;display: flex;align-items: center;margin: auto; width: 600px;text-align: center;">
           <div style="border-radius: 50%;">
-            <img src="<?php echo $_SESSION['info']['image'] ?>" style="border-radius: 50%;height: 300px;object-fit: cover;">
+          <?php if(!empty($_SESSION['info']['image'])): ?>
+            <img src="<?php echo $_SESSION['info']['image'] ?>" style="border-radius: 50%;height: 150px;object-fit: cover;">
+          <?php else: ?>
+            <img src="uploads/tokumei.jpeg" style="border-radius: 50%;height: 150px;object-fit: cover;">
+          <?php endif; ?>
           </div>
           <div style="margin-left: 50px;">
             <p style="font-weight: 400; font-size: 25px;"><?php echo $_SESSION['info']['username'] ?></p>
