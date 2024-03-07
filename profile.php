@@ -98,7 +98,10 @@
 
         <div style="display:flex;align-items: center;">
         <?php if(file_exists($user_row['image'])): ?>
-          <img src="<?php echo $user_row['image'] ?>" style="width: 100px; height: 100px;object-fit: cover; border-radius: 50%;margin-right: 20px;">
+          <div class="preview" style="margin-right: 20px;">
+          <img src="<?php echo $user_row['image'] ?>" style="width: 100px; height: 100px;object-fit: cover; border-radius: 50%;">
+            
+          </div>
         <?php else: ?>
           <div class="preview" style=""></div>
         <?php endif; ?>

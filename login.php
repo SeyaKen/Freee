@@ -48,7 +48,10 @@
 </head>
 <body>
   
+  <div style="height: 100vh;display:flex;">
+  <?php if(!empty($_SESSION['info']['email']) && $_SESSION['info']['email'] == 'owner@mail.com'): ?>
   <?php require "header.php"; ?>
+  <?php endif; ?> 
     <div style="margin: auto; max-width: 600px;">
 
       <?php
@@ -66,6 +69,7 @@
 
         <button>Login</button>
       </form>
+      </div>
       </div>
   <?php require "footer.php"; ?>
   
