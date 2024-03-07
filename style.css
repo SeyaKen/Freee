@@ -75,7 +75,6 @@ textarea {
   border-radius: 5px;
   cursor: pointer;
   font-weight: bold;
-  font-size: 16px;
   color: #060606;
   text-align: center;
   text-decoration: none;
@@ -109,8 +108,8 @@ textarea {
   background-color: #dbdbdb !important;
 }
 
-.pforile-list-button{
-  background-color: #0095f6 !important;
+.profile-list-button{
+  background-color: #0095f6;
   border-radius: 5px;
   cursor: pointer;
   font-weight: bold;
@@ -124,6 +123,27 @@ textarea {
   justify-content: center;
 }
 
-.pforile-list-button:hover {
-  background-color: #1a77f2 !important;
+.profile-list-button:hover {
+  background-color: #1a77f2;
+}
+
+.button-delete {
+  padding: 10px 15px;
+  width: 100px;
+  border: none;
+  background-color:#ed4956;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  color: white;
+  text-align: center;
+  text-decoration: none;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.preview {
+  background-image:url(uploads/tokumei.jpeg);border-radius: 50%;width: 100px; height: 100px;background-size: cover;;margin-right: 10px;
 }

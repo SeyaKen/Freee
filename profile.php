@@ -6,107 +6,36 @@
   error_reporting(E_ALL);
   
   check_login();
-  // 👇投稿を削除する処理
-  if($_SERVER['REQUEST_METHOD'] == "POST" && !empty($_POST['action']) && $_POST['action'] == 'post_delete') {
-    // Profileのデータを消す処理
-    $id = $_GET['id'] ?? 0;
-    // $_GET['id']がなかったら0を代入
-    $user_id = $_SESSION['info']['id'];
-
-    $query = "select * from posts where id = '$id' && user_id = '$user_id' limit 1";
-    $result = mysqli_query($con, $query);
-    if(mysqli_num_rows($result) > 0){
-
-      $row = mysqli_fetch_assoc($result);
-      // 👇投稿を消すときに写真も消す処理
-      if(file_exists($row['image'])){
-      unlink($row['image']);
-      }
-    }
+  // 👇プロフィールを削除（退会）する処理
+  if($_SERVER['REQUEST_METHOD'] == "POST" && !empty($_POST['action']) && $_POST['action'] == 'real_delete') {
+    $id = $_POST['id'];
+    $query = "select image from users where id = '$id'";
+    $img = mysqli_query($con, $query);
     
-    $query = "delete from posts where id = '$id' && user_id = '$user_id' limit 1";
+    $query = "delete from users where id = '$id'";
     $result = mysqli_query($con, $query);
-
-    header("Location: profile.php");
-    die;
-  }
-  // 👇投稿を編集する処理
-  elseif($_SERVER['REQUEST_METHOD'] == "POST" && !empty($_POST['action'] == "post_edit"))
-  {
-    $id = $_GET['id'] ?? 0;
-    // $_GET['id']がなかったら0を代入
-    $user_id = $_SESSION['info']['id'];
-    $image_added = false;
-    // 👇画像がある場合
-    if(!empty($_FILES['image']['name']) && $_FILES['image']['error'] == 0) {
-      // file was uploaded
-      $folder = "uploads/";
-      if(!file_exists($folder)){
-        
-        mkdir($folder, 0777, true);
-      }
-      $image = $folder . $_FILES['image']['name'];
-      move_uploaded_file($_FILES['image']['tmp_name'], $image);
-
-      $query = "select * from posts where id = '$id' && user_id = '$user_id' limit 1";
-        $result = mysqli_query($con, $query);
-        if(mysqli_num_rows($result) > 0){
-
-          $row = mysqli_fetch_assoc($result);
-          // 👇投稿を編集するときに前の写真を消す処理
-          if(file_exists($row['image'])){
-            unlink($row['image']);
-          }
-        }
-
-      $image_added = true;
-
-      }
-      
-      $post = addslashes($_POST['post']);
-      // addslashedは自動で\を追加してくれる
-      // \はKen's Breadなどの「'」を文字列として認識するためのもの
-
-      if($image_added == true) {
-        $query = "update posts set post = '$post', image = '$image' where id = '$id' && user_id = '$user_id' limit 1 ";
-      } else {
-        $query = "update posts set post = '$post' where id = '$id && user_id = '$user_id' limit 1 ";
-      }
-
-      $result = mysqli_query($con, $query);
-
-      header("Location: profile.php");
-      die;
-    }
-    // 👇プロフィールを削除（退会）する処理
-    elseif($_SERVER['REQUEST_METHOD'] == "POST" && !empty($_POST['action']) && $_POST['action'] == 'delete') {
-    $id = $_SESSION['info']['id'];
-    $query = "delete from users where id = '$id' limit 1";
+    $query = "delete from kyuuryoujikan where user_id = '$id'";
+    $result = mysqli_query($con, $query);
+    $query = "delete from kintai where user_id = '$id'";
     $result = mysqli_query($con, $query);
 
     // 👇退会するときに写真も消す処理
     if(file_exists($_SESSION['info']['image'])){
-      unlink($_SESSION['info']['image']);
+      unlink($img);
     }
 
-    // 👇退会するときに投稿も消す処理
-    $query = "delete from posts where user_id ='$id'";
-    $result = mysqli_query($con, $query);
-
-    header("Location: logout.php");
+    header("Location: profile_list.php");
     die;
   }
-  // 👇プロフィールを登録する処理
+  // 👇プロフィールを更新？する処理
   elseif($_SERVER['REQUEST_METHOD'] == "POST" && !empty($_POST['username']))
   {
+    $id = $_POST['id'];
     $image_added = false;
     if(!empty($_FILES['image']['name']) && $_FILES['image']['error'] == 0) {
+      // echo $_FILES['image']['name'];die;
       // file was uploaded
       $folder = "uploads/";
-      if(!file_exists($folder)){
-        
-        mkdir($folder, 0777, true);
-      }
       $image = $folder . $_FILES['image']['name'];
       move_uploaded_file($_FILES['image']['tmp_name'], $image);
 
@@ -124,7 +53,6 @@
     // \はKen's Breadなどの「'」を文字列として認識するためのもの
     $email = addslashes($_POST['email']);
     $password = addslashes($_POST['password']);
-    $id = $_SESSION['info']['id'];
 
     if($image_added == true) {
       $query = "update users set username = '$username', email = '$email', password = '$password', image = '$image' where id = '$id' limit 1 ";
@@ -133,45 +61,8 @@
     }
 
     $result = mysqli_query($con, $query);
-
-    $query = "select * from users where id = '$id' limit 1";
-    $result = mysqli_query($con, $query);
-    
-    if(mysqli_num_rows($result) > 0) {
-      // 更新した処理を$_SESSIONに保存する処理
-      $_SESSION['info']  = mysqli_fetch_assoc($result);
-      // $_SESSIONに入れることでどのページでも使える値になる
-    }
  
-    header("Location: profile.php");
-    die;
-  }
-  // 👇投稿を追加する処理
-  elseif($_SERVER['REQUEST_METHOD'] == "POST" && !empty($_POST['post']))
-  {
-    
-    $image = "";
-    if(!empty($_FILES['image']['name']) && $_FILES['image']['error'] == 0 && $_FILES['image']['type'] == 0) {
-      // file was uploaded
-      $folder = "uploads/";
-      if(!file_exists($folder)){
-        
-        mkdir($folder, 0777, true);
-      }
-      $image = $folder . $_FILES['image']['name'];
-      move_uploaded_file($_FILES['image']['tmp_name'], $image);
-    }
-    
-    $post = addslashes($_POST['post']);
-    $user_id = $_SESSION['info']['id'];
-    $date = date('Y-m-d H:i:s');
-
-    $query = "insert into posts (user_id, post, image, date) value ('$user_id', '$post', '$image', '$date')";
-    
-
-    $result = mysqli_query($con, $query);
- 
-    header("Location: profile.php");
+    header("Location: profile_list.php");
     die;
   }
 ?>
@@ -183,6 +74,7 @@
   <title>Profile - my website</title>
   <link href="style.css" rel="stylesheet" type="text/css">
   <link href="https://use.fontawesome.com/releases/v6.2.0/css/all.css" rel="stylesheet">
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 </head>
 <body>
   
@@ -190,96 +82,140 @@
 
   <?php require "header.php"; ?>
 
-  <!-- 👇投稿を削除する処理 -->
-  <?php if(!empty($_GET['action']) && $_GET['action'] == 'post_delete' && !empty($_GET['id'])):?>
-    <?php
-      $id = (int)$_GET['id'];
-      // 文字列をint型として変換
-      $query = "select * from posts where id = '$id' limit 1";
-      $result = mysqli_query($con, $query);
-      
-    ?>
-
-    <?php if(mysqli_num_rows($result) > 0): ?>
-      <?php $row = mysqli_fetch_assoc($result); ?>
-      <h3>Are you sure you want to delete?</h3>
-      <form method="post" enctype="multipart/form-data" style="margin: auto; pading: 10px;">
-        <?php if(!empty($row['image'])): ?>
-        <img src="<?= $row['image'];?>" style="width: 100%;height:200px; object-fit:cover;"><br>
-        <?php endif; ?>
-        <div><?php $row['post'];?></div><br>
-        <input type="hidden" name="action" value="post_delete">
-
-        <button>Delete</button>
-        <a href="profile.php">
-          <button type="button">Cancel</button>
-        </a>
-      </form>
-    <?php endif; ?>
-
-  <!-- 👇投稿を編集する処理 -->
-  <?php elseif(!empty($_GET['action']) && $_GET['action'] == 'post_edit' && !empty($_GET['id'])):?>
-    <?php
-      $id = (int)$_GET['id'];
-      // 文字列をint型として変換
-      $query = "select * from posts where id = '$id' limit 1";
-      $result = mysqli_query($con, $query);
-      
-    ?>
-
-    <?php if(mysqli_num_rows($result) > 0): ?>
-      <?php $row = mysqli_fetch_assoc($result); ?>
-      <h5>Edit a post</h5>
-      <form method="post" enctype="multipart/form-data" style="margin: auto; pading: 10px;">
-        <?php if(!empty($row['image'])): ?>
-        <img src="<?= $row['image'];?>" style="width: 100%;height:200px; object-fit:cover;"><br>
-        <?php endif; ?>
-        <input type="file" name="image">
-        <textarea name="post" rows="8"><?php $row['post'];?></textarea><br>
-        <input type="hidden" name="action" value="post_edit">
-
-        <button>Save</button>
-        <a href="profile.php">
-          <button type="button">Cancel</button>
-        </a>
-      </form>
-    <?php endif; ?>
-
   <!-- 👇プロフィールを編集する処理 -->
-  <?php elseif(!empty($_GET['action']) && $_GET['action'] == 'edit'):?>
-    <h2 style="text-align: center;">Edit Profile</h2>
-      <form method="post" enctype="multipart/form-data" style="margin: auto; pading: 10px;">
+  <?php if(!empty($_GET['action']) && $_GET['action'] == 'edit' && !empty($_GET['id'])):?>
+    <?php
+      $id = $_GET['id'];
+      $query = "select * from users where id = '$id' limit 1";
+      $result2 = mysqli_query($con, $query);
+      $user_row = mysqli_fetch_assoc($result2);
+    ?>
+    <div style="margin: 0 auto; width: 650px;">
+      <h2 style="margin: 30px 0 20px 0;">プロフィールを編集</h2>
+      <div style="">
 
-        <img src="<?php echo $_SESSION['info']['image'] ?>" style="width: 100px; height: 100px;object-fit: cover;margin: auto; display: block">
-        <input value="<?php echo $_SESSION['info']['image'] ?>" type="file" name="image"><br>
-        <input value="<?php echo $_SESSION['info']['username'] ?>" type="text" name="username" placeholder="Username" required><br>
-        <input value="<?php echo $_SESSION['info']['email'] ?>" type="text" name="email" placeholder="Email" required><br>
-        <input value="<?php echo $_SESSION['info']['password'] ?>" type="text" name="password" placeholder="Password" required><br>
+        <div style="display:flex;align-items: center;justify-content: space-between;width: 100%;">
 
-        <button>Save</button>
+        <div style="display:flex;align-items: center;">
+        <?php if(file_exists($user_row['image'])): ?>
+          <img src="<?php echo $user_row['image'] ?>" style="width: 100px; height: 100px;object-fit: cover; border-radius: 50%;margin-right: 20px;">
+        <?php else: ?>
+          <div class="preview" style=""></div>
+        <?php endif; ?>
 
-        <a href="profile.php">
-          <button type="button">Cancel</button>
-        </a>
-      </form>
+          <div>
+            <p style="color: #737373;font-size: 15px;"><?php echo $user_row['email']; ?></p>
+            <p style="color: #737373;font-size: 15px;"><?php echo $user_row['username']; ?></p>
+            <p style="color: #737373;font-size: 15px;">id: <?php echo $user_row['id'];?></p>
+          </div>
+        </div>
 
-  <?php elseif(!empty($_GET['action']) && $_GET['action'] == 'delete'):?>
-    <h2 style="text-align: center;">Are you sure you want to delete your profile?</h2>
-      <div style="margin: auto; max-width: 600px;text-align: center;"> 
-        <form method="post" style="margin: auto; pading: 10px;">
-          <img src="<?php echo $_SESSION['info']['image'] ?>" style="width: 100px; height: 100px;object-fit: cover;margin: auto; display: block">
-          <div><?php echo $_SESSION['info']['username'] ?></div>
-          <div><?php echo $_SESSION['info']['email'] ?></div>
 
-          <!-- 👇ここで$_POST['action']にdeleteが追加？される -->
-          <input type="hidden" name="action" value="delete">
-          <button>Delete</button>
+        <form method="post" enctype="multipart/form-data">
+          <div>
+            <label class="profile-list-button" style="padding: 0 10px;"><input id="imgFile" style="display: none;" type="file" name="image">ファイルを選択</label>
+          </div>
 
-          <a href="profile.php">
-            <button type="button">Cancel</button>
-          </a>
+          <input type="hidden" name="id" value="<?php echo $user_row['id'];?>">
+          <!-- 👇imgを読み込みjQeryでプレビューを表示する処理 -->
+          <script>
+              $('#imgFile').change(
+              function () {
+                  if (!this.files.length) {
+                      return;
+                  }
+
+                  var file = $(this).prop('files')[0];
+                  var fr = new FileReader();
+                  $('.preview').css('background-image', 'none');
+                  fr.onload = function() {
+                      $('.preview').css('background-image', 'url(' + fr.result + ')');
+                  }
+                  fr.readAsDataURL(file);
+                  $(".preview img").css('opacity', 0);
+              }
+          );
+          </script>
+
+        </div>
+          
+          <div style="margin-top:10px;">
+            <h4>名前:</h4><input style="margin: 5px 0;" value="<?php echo $user_row['username'] ?>" type="text" name="username" placeholder="Username" required>
+          </div>
+
+          <div style="margin-top:10px;">
+            <h4>メールアドレス:</h4><input style="margin: 5px 0;" value="<?php echo $user_row['email'] ?>" type="text" name="email" placeholder="Email" required>
+          </div>
+
+          <div style="margin-top:10px;">
+            <h4>パスワード:</h4><input style="margin: 5px 0;" value="<?php echo $user_row['password'] ?>" type="text" name="password" placeholder="Password" required>
+          </div>
+
+          <div style="display:flex;margin-top: 20px;">
+          <button class="button-delete" style="margin-right: 20px;background-color: #0095f6;">保存する</button>
+          
+         
+          <div style="display:flex;align-items: center;width: 100px">
+            <a href="<?php echo $_SERVER['HTTP_REFERER'];?>" style="width: 100%;">
+              <p class="profile-list-button" style="padding: 0 10px;color: #060606;background-color: #dbdbdb;">キャンセル</p>
+            </a>
+          </div>
         </form>
+          
+        </div>
+
       </div>
+    </div>
+    </div>
+  <!-- 👇プロフィールを削除する画面 -->
+  <?php elseif(!empty($_GET['id']) && !empty($_GET['action']) && $_GET['action'] == 'delete'):?>
+    <?php
+      $id = $_GET['id'];
+      $query = "select * from users where id = '$id' limit 1";
+      $result2 = mysqli_query($con, $query);
+      $user_row = mysqli_fetch_assoc($result2);
+    ?>
+
+<div style="margin: 0 auto; width: 650px;">
+    <h2 style="margin: 30px 0 20px 0;">プロフィールを本当に削除しますか？</h2>
+      <div style="display:flex;align-items: center;justify-content: space-between;">
+        <div style="display:flex;align-items: center;">
+  
+        <?php if(!empty($user_row['image'])): ?>
+          <img src="<?php echo $user_row['image'] ?>" style="width: 100px; height: 100px;object-fit: cover; border-radius: 50%;margin-right: 20px;">
+        <?php else: ?>
+          <img src="uploads/tokumei.jpeg" style="width: 100%; border-radius: 50%;height: 44px;width: 44px; object-fit:cover;margin-right: 10px;">
+        <?php endif; ?>
+          <div>
+            <p style="color: #737373;font-size: 15px;"><?php echo $user_row['email']; ?></p>
+            <p style="color: #737373;font-size: 15px;"><?php echo $user_row['username']; ?></p>
+            <p style="color: #737373;font-size: 15px;">id: <?php echo $user_row['id'];?></p>
+          </div>
+        </div>
+
+        <div style="display: flex;">
+        <form method="post">
+          <div style="display:flex;align-items: center;margin-right: 10px;">
+              <!-- 👇ここで$_POST['action']にdeleteが追加？される -->
+          <input type="hidden" name="action" value="real_delete">
+          <input type="hidden" name="id" value="<?php echo $user_row['id'];?>">
+          <button class="button-delete" style="margin-right: 20px;">削除する</button>
+          
+         
+          <div style="display:flex;align-items: center;width: 100px">
+            <a href="<?php echo $_SERVER['HTTP_REFERER'];?>" style="width: 100%;">
+              <p class="profile-list-button" style="padding: 0 10px;">キャンセル</p>
+            </a>
+          </div>
+        </form>
+          </div>
+
+          
+        </div>
+
+      </div>
+    </div>
+
   <?php elseif(!empty($_GET['action'])):?>
     <?php
       $id = $_GET['action'];
@@ -287,26 +223,38 @@
       $result2 = mysqli_query($con, $query);
       $user_row = mysqli_fetch_assoc($result2);
     ?>
-    <div style="margin: 0 auto; max-width: 600px;">
-    <h4 style="margin: 30px 0 20px 0;">プロフィール</h4>
-      <div>
-        <td><img src="<?php echo $user_row['image'] ?>" style="width: 150px; height: 150px;object-fit: cover;"></td>
-      </div>
-      <div>
-        <th>Username:</th><td><?php echo $user_row['username'] ?></td>
-      </div>
-      <div>
-        <th>Email:</th><td><?php echo $user_row['email'] ?></td>
-      </div>
+    <div style="margin: 0 auto; width: 650px;">
+    <h2 style="margin: 30px 0 20px 0;">プロフィール</h2>
+      <div style="display:flex;align-items: center;justify-content: space-between;">
+        <div style="display:flex;align-items: center;">
+        <?php if(file_exists($user_row['image'])): ?>
+          <img src="<?php echo $user_row['image'] ?>" style="width: 100px; height: 100px;object-fit: cover; border-radius: 50%;margin-right: 20px;">
+        <?php else: ?>
+          <img src="uploads/tokumei.jpeg" style="width: 100%; border-radius: 50%;height: 44px;width: 44px; object-fit:cover;margin-right: 10px;">
+        <?php endif; ?>
 
-      <a href="profile.php?action=edit">
-        <button>Edit profile</button>
-      </a>
+          <div>
+            <p style="color: #737373;font-size: 15px;"><?php echo $user_row['email']; ?></p>
+            <p style="color: #737373;font-size: 15px;"><?php echo $user_row['username']; ?></p>
+            <p style="color: #737373;font-size: 15px;">id: <?php echo $user_row['id'];?></p>
+          </div>
+        </div>
 
-      <a href="profile.php?action=delete">
-        <button>Delete profile</button>
-      </a>
+        <div style="display: flex; ">
+          <div style="display:flex;align-items: center;margin-right: 10px;">
+            <a style="width: 100%;" href="profile.php?action=edit&id=<?php echo $user_row['id'];?>">
+              <p class="profile-list-button" style="padding: 0 10px;">プロフィールを編集</p>
+            </a>
+          </div>
 
+          <div style="display:flex;align-items: center;">
+            <a href="profile.php?action=delete&id=<?php echo $user_row['id'];?>" style="width: 100%;">
+            <p class="profile-list-button" style="padding: 0 10px;background-color:#ed4956;">プロフィールを削除</p>
+            </a>
+          </div>
+        </div>
+
+      </div>
     </div>
 
     <?php endif;?>

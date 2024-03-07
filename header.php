@@ -2,7 +2,6 @@
 
   <?php if(empty($_SESSION['info'])):?>
     <div><a href="login.php"><i class="fa-solid fa-right-to-bracket"></i> ログイン</a></div>
-    <div><a href="signup.php"><i class="fa-solid fa-user-plus"></i> 新規登録</a></div>
   <?php elseif($_SESSION['info']['email'] == 'owner@mail.com'): ?>
     <div style="margin-top: 30px;"><a href="index.php"><i class="fa-solid fa-house fa-lg"></i> ホーム</a></div>
     <div><a href="profile_list.php"><i class="fa-solid fa-user fa-lg"></i> プロフィール一覧</a></div>
