@@ -212,8 +212,6 @@
           </div>
         </form>
           </div>
-
-          
         </div>
 
       </div>
@@ -227,7 +225,40 @@
       $user_row = mysqli_fetch_assoc($result2);
     ?>
     <div style="margin: 0 auto; width: 650px;">
-    <h2 style="margin: 30px 0 20px 0;">プロフィール</h2>
+    <h2 style="margin: 30px 0 5px 0;">プロフィール</h2>
+      <div style="display:flex;align-items: center;justify-content: space-between;">
+        <div style="display:flex;align-items: center;">
+        <?php if(file_exists($user_row['image'])): ?>
+          <img src="<?php echo $user_row['image'] ?>" style="width: 100px; height: 100px;object-fit: cover; border-radius: 50%;margin-right: 20px;">
+        <?php else: ?>
+          <img src="uploads/tokumei.jpeg" style="width: 100%; border-radius: 50%;height: 44px;width: 44px; object-fit:cover;margin-right: 10px;">
+        <?php endif; ?>
+
+          <div>
+            <p style="color: #737373;font-size: 15px;"><?php echo $user_row['email']; ?></p>
+            <p style="color: #737373;font-size: 15px;"><?php echo $user_row['username']; ?></p>
+            <p style="color: #737373;font-size: 15px;">id: <?php echo $user_row['id'];?></p>
+          </div>
+        </div>
+        <div style="display: flex; ">
+          <div style="display:flex;align-items: center;margin-right: 10px;">
+            <a style="width: 100%;" href="profile.php?action=edit&id=<?php echo $user_row['id'];?>">
+              <p class="profile-list-button" style="padding: 0 10px;">プロフィールを編集</p>
+            </a>
+          </div>
+
+          <div style="display:flex;align-items: center;">
+            <a href="profile.php?action=delete&id=<?php echo $user_row['id'];?>" style="width: 100%;">
+            <p class="profile-list-button" style="padding: 0 10px;background-color:#ed4956;">プロフィールを削除</p>
+            </a>
+          </div>
+        </div>
+      </div>
+
+
+      
+      <!-- 👇給料・労働時間の変更 -->
+      <h2 style="margin: 60px 0 5px 0;">給料・労働時間</h2>
       <div style="display:flex;align-items: center;justify-content: space-between;">
         <div style="display:flex;align-items: center;">
         <?php if(file_exists($user_row['image'])): ?>
@@ -246,18 +277,18 @@
         <div style="display: flex; ">
           <div style="display:flex;align-items: center;margin-right: 10px;">
             <a style="width: 100%;" href="profile.php?action=edit&id=<?php echo $user_row['id'];?>">
-              <p class="profile-list-button" style="padding: 0 10px;">プロフィールを編集</p>
+              <p class="profile-list-button" style="padding: 0 10px;">給料・労働時間を編集</p>
             </a>
           </div>
 
           <div style="display:flex;align-items: center;">
             <a href="profile.php?action=delete&id=<?php echo $user_row['id'];?>" style="width: 100%;">
-            <p class="profile-list-button" style="padding: 0 10px;background-color:#ed4956;">プロフィールを削除</p>
+            <p class="profile-list-button" style="padding: 0 10px;background-color:#ed4956;">給料・労働時間を削除</p>
             </a>
           </div>
         </div>
-
       </div>
+
     </div>
 
     <?php endif;?>
