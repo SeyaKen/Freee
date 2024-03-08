@@ -16,12 +16,21 @@
       $name = $_SESSION['info']['username'];
       $time = $_POST['time'];
       // echo $id.$name.$time;die;
-      $query = "insert into kintai (user_id, kintai, name, time) value ('$user_id', 1, '$name', '$time') ";
 
+      $query = "select * from kintai where user_id = '$user_id'";
       $result = mysqli_query($con, $query);
+      // echo print_R($result);die;
+      if(mysqli_num_rows($result) == 0) {
+        // echo $result;die;
+        $query = "insert into kintai (user_id, kintai, name, time) value ('$user_id', 1, '$name', '$time')";
+        $result = mysqli_query($con, $query);
+      }
 
-      $query = "select * from kintai where time = '$time' && user_id = '$user_id' limit 1";
+      $query = "update kintai set kintai = 1, time = '$time' where user_id = '$user_id' limit 1";
+      mysqli_query($con, $query);
+      $query = "select * from kintai where user_id = '$user_id'";
       $result = mysqli_query($con, $query);
+      // echo print_R($result);die;
 
       if(mysqli_num_rows($result) > 0) {
         $_SESSION['kintai']  = mysqli_fetch_assoc($result);
@@ -90,102 +99,6 @@
     header("Location: kintai.php");
     die;
     }
-    // 👇プロフィールを削除（退会）する処理
-    elseif($_SERVER['REQUEST_METHOD'] == "POST" && !empty($_POST['action']) && $_POST['action'] == 'delete') {
-    $id = $_SESSION['info']['id'];
-    $query = "delete from users where id = '$id' limit 1";
-    $result = mysqli_query($con, $query);
-
-    // 👇退会するときに写真も消す処理
-    if(file_exists($_SESSION['info']['image'])){
-      unlink($_SESSION['info']['image']);
-    }
-
-    // 👇退会するときに投稿も消す処理
-    $query = "delete from posts where user_id ='$id'";
-    $result = mysqli_query($con, $query);
-
-    header("Location: logout.php");
-    die;
-  }
-  // 👇プロフィールを登録する処理
-  elseif($_SERVER['REQUEST_METHOD'] == "POST" && !empty($_POST['username']))
-  {
-    $image_added = false;
-    if(!empty($_FILES['image']['name']) && $_FILES['image']['error'] == 0) {
-      // file was uploaded
-      $folder = "uploads/";
-      if(!file_exists($folder)){
-        
-        mkdir($folder, 0777, true);
-      }
-      $image = $folder . $_FILES['image']['name'];
-      move_uploaded_file($_FILES['image']['tmp_name'], $image);
-
-      // 👇古い写真を自動で消す処理
-      // if(file_exists($_SESSION['info']['image'])){
-      //   unlink($_SESSION['info']['image']);
-      // }
-
-      $image_added = true;
-
-    }
-    
-    $username = addslashes($_POST['username']);
-    // addslashedは自動で\を追加してくれる
-    // \はKen's Breadなどの「'」を文字列として認識するためのもの
-    $email = addslashes($_POST['email']);
-    $password = addslashes($_POST['password']);
-    $id = $_SESSION['info']['id'];
-
-    if($image_added == true) {
-      $query = "update users set username = '$username', email = '$email', password = '$password', image = '$image' where id = '$id' limit 1 ";
-    } else {
-      $query = "update users set username = '$username', email = '$email', password = '$password' where id = '$id' limit 1 ";
-    }
-
-    $result = mysqli_query($con, $query);
-
-    $query = "select * from users where id = '$id' limit 1";
-    $result = mysqli_query($con, $query);
-    
-    if(mysqli_num_rows($result) > 0) {
-      // 更新した処理を$_SESSIONに保存する処理
-      $_SESSION['info']  = mysqli_fetch_assoc($result);
-      // $_SESSIONに入れることでどのページでも使える値になる
-    }
- 
-    header("Location: profile.php");
-    die;
-  }
-  // 👇投稿を追加する処理
-  elseif($_SERVER['REQUEST_METHOD'] == "POST" && !empty($_POST['post']))
-  {
-    
-    $image = "";
-    if(!empty($_FILES['image']['name']) && $_FILES['image']['error'] == 0 && $_FILES['image']['type'] == 0) {
-      // file was uploaded
-      $folder = "uploads/";
-      if(!file_exists($folder)){
-        
-        mkdir($folder, 0777, true);
-      }
-      $image = $folder . $_FILES['image']['name'];
-      move_uploaded_file($_FILES['image']['tmp_name'], $image);
-    }
-    
-    $post = addslashes($_POST['post']);
-    $user_id = $_SESSION['info']['id'];
-    $date = date('Y-m-d H:i:s');
-
-    $query = "insert into posts (user_id, post, image, date) value ('$user_id', '$post', '$image', '$date')";
-    
-
-    $result = mysqli_query($con, $query);
- 
-    header("Location: profile.php");
-    die;
-  }
 ?>
 <!DOCTYPE html>
 <html lang="ja">
@@ -198,13 +111,13 @@
 </head>
 <body>
   
-  <div style="display:flex">
+  <div style="display:flex;height: 100vh;">
   <?php require "header.php"; ?>
-    <div style="padding: 30px 20px 0; margin: auto;">
+    <div style="padding: 30px 20px 0; margin: auto;border: 1px solid #dbdbdb;">
       
       <!-- 👇勤怠を記録する画面 -->
       <?php if(!empty($_GET['action']) && $_GET['action'] == 'kintaigamen'):?>
-        <h2 style="text-align: center;">
+        <h2 style="text-align: center;margin-bottom: 30px;">
         <?php if(!empty($_SESSION['kintai']['kintai']) && $_SESSION['kintai']['kintai']){
             echo "退勤する";
           } else {
@@ -224,7 +137,7 @@
                     }
                   ?>>
 
-            <div class="kintai-bottom-button">
+            <div class="kintai-bottom-button" style="margin: 30px auto; width: 250px;">
               <div>
                 <button>
                   <?php if(!empty($_SESSION['kintai']['kintai']) && $_SESSION['kintai']['kintai']){

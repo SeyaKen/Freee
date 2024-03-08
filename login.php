@@ -52,7 +52,7 @@
   <?php if(!empty($_SESSION['info']['email']) && $_SESSION['info']['email'] == 'owner@mail.com'): ?>
   <?php require "header.php"; ?>
   <?php endif; ?> 
-    <div style="margin: auto; max-width: 600px;">
+    <div style="margin: auto; width: 350px;border: 1px solid #dbdbdb;height: 400px;display: flex; align-items:center;">
 
       <?php
         // ログインの時にエラーがあった時ユーザーに知らせる
@@ -61,14 +61,22 @@
         }
       ?>
 
-      <h2 style="text-align: center;">Login</h2>
+
+    <div style="height: 80%;">
+    <div style="text-align:center;">
+        <img src="uploads/kintai.png" style="width: 52%;">
+      </div>
+      <div style="margin: 0 40px 6px;">
       <form method="post" style="margin: auto; pading: 10px;">
 
-        <input type="email" name="email" placeholder="Email" required><br>
-        <input type="text" name="password" placeholder="Password" required><br>
+        <input style="margin: 5px 0;" type="email" name="email" placeholder="Email" required><br>
+        <input style="margin: 5px 0;" type="text" name="password" placeholder="Password" required><br>
 
-        <button>Login</button>
+        <button class="button-delete" style="margin-top:80px;width: 100%;background-color: #0095f6;"><p>ログイン</p></button>
       </form>
+      </div>
+    </div>
+      
       </div>
       </div>
   <?php require "footer.php"; ?>

@@ -38,24 +38,45 @@
             $query = "select * from users where id = '$id' limit 1";
             $result2 = mysqli_query($con, $query);
             $user_row = mysqli_fetch_assoc($result2);
+            // 👇給料のデータを持ってくる
+            $query = "select * from kyuuryoujikan where user_id = '$id'";
+            $kyuuryou_result = mysqli_query($con, $query);
+            $sou_kyuuryou = 0;
+            $sou_roudou  = 0;
+            if (!empty($kyuuryou_result)) {
+              while ($roww = mysqli_fetch_assoc($kyuuryou_result)) {
+                $sou_kyuuryou += $roww['time'];
+                $sou_roudou += $roww['kyuuryou'];
+              }
+            }
+            $query = "select kintai from kintai where user_id = '$id'";
+            $kintai_result = mysqli_query($con, $query);
+            $kintai = 0;
+            if (mysqli_num_rows($kintai_result) > 0) {
+              $kintai = mysqli_fetch_assoc($kintai_result)['kintai'];
+            }
           ?>
             
               <div style="align-items:center;height: 68px;display:flex;justify-content: space-between;padding: 8px 0;">
               <div style="display:flex;align-items: center;">
-              <?php if(file_exists($row['image'])): ?>
-                <img src="<?= $row['image'];?>" style="width: 100%; border-radius: 50%;height: 44px;width: 44px; object-fit:cover;margin-right: 10px;">
-              <?php else: ?>
-                <img src="uploads/tokumei.jpeg" style="width: 100%; border-radius: 50%;height: 44px;width: 44px; object-fit:cover;margin-right: 10px;">
-              <?php endif; ?>
+                <div style="position: relative; width: 44px; height: 44px;margin-right: 10px;">
+                  <?php if(file_exists($row['image'])): ?>
+                  <img src="<?= $row['image'];?>" style="width: 100%; border-radius: 50%;height: 44px;width: 44px; object-fit:cover;">
+                  <?php else: ?>
+                    <img src="uploads/tokumei.jpeg" style="width: 100%; border-radius: 50%;height: 44px;width: 44px; object-fit:cover;">
+                  <?php endif; ?>
+                  <p style="color: <?php echo $kintai == 1 ? '#06c755' : 'red';?>;position: absolute;top: 24px;right: -4px;-webkit-text-stroke: 2.5px #FFF;font-size: 20px;">⚫︎</p>
+                </div>
                 <div>
                   <p style="color: #737373;font-size: 12px;"><?php echo nl2br(htmlspecialchars($user_row['username']));?></p>
-                  <p style="color: #737373;font-size: 12px;"><?php echo $user_row['email'];?></p>
-                  <p style="color: #737373;font-size: 11px;">id: <?php echo $id;?></p>
+                  <p style="color: #737373;font-size: 12px;">給料（今月）:<?php echo $sou_kyuuryou; ?>円</p>
+                  <p style="color: #737373;font-size: 12px;">労働時間（今月）: <?php echo floor($sou_roudou/60);?>時間</p>
                 </div>
               </div>
+              
                 <div  style="width: 100px;display:flex;align-items: center;">
                   <a href="profile.php?action=<?php echo $id; ?>" style="width: 100%;">
-                    <p class="profile-list-button">プロフィール</p>
+                    <p class="profile-list-button">詳細</p>
                   </a>
                 </div>
               </div>
