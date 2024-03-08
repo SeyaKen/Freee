@@ -48,18 +48,19 @@
 </head>
 <body>
   
+<?php
+        // ログインの時にエラーがあった時ユーザーに知らせる
+        if(!empty($error)) {
+          echo "<p style='text-align:center;margin-top: 30px;'>". "パスワードかメールアドレスが間違っています。"."</p>";
+        }
+      ?>
   <div style="height: 100vh;display:flex;">
   <?php if(!empty($_SESSION['info']['email']) && $_SESSION['info']['email'] == 'owner@mail.com'): ?>
   <?php require "header.php"; ?>
   <?php endif; ?> 
     <div style="margin: auto; width: 350px;border: 1px solid #dbdbdb;height: 400px;display: flex; align-items:center;">
 
-      <?php
-        // ログインの時にエラーがあった時ユーザーに知らせる
-        if(!empty($error)) {
-          echo "<div>". $error."<div>";
-        }
-      ?>
+      
 
 
     <div style="height: 80%;">

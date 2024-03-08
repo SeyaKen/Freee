@@ -1,8 +1,8 @@
 
 <div class="side-bar" style="width: 200px;">
   
-  <div style="margin: 20px 0;">
-    <img src="uploads/kintai.png" style="width: 52%;">
+  <div style="margin: 20px 0;padding: 0 11px;">
+    <img src="uploads/kintai.png" style="width: 80%;">
   </div>
   <?php if(empty($_SESSION['info'])):?>
   <?php elseif($_SESSION['info']['email'] == 'owner@mail.com'): ?>

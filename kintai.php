@@ -11,11 +11,10 @@
 
   // 👇出勤を入力する処理
   if($_SERVER['REQUEST_METHOD'] == "POST" && !empty($_POST['action']) && $_POST['action'] == 'shukkin') {
-    
+         
       $user_id = $_SESSION['info']['id'];
       $name = $_SESSION['info']['username'];
       $time = $_POST['time'];
-      // echo $id.$name.$time;die;
 
       $query = "select * from kintai where user_id = '$user_id'";
       $result = mysqli_query($con, $query);
@@ -98,7 +97,24 @@
 
     header("Location: kintai.php");
     die;
-    }
+    
+  } else {
+    $user_id = $_SESSION['info']['id'];
+      $name = $_SESSION['info']['username'];
+
+      $query = "select * from kintai where user_id = '$user_id'";
+      $result = mysqli_query($con, $query);
+      // echo print_R($result);die;
+      if(mysqli_num_rows($result) != 0) {
+        $query = "select * from kintai where user_id = '$user_id'";
+        $result = mysqli_query($con, $query);
+        // echo print_R($result);die;
+
+        if(mysqli_num_rows($result) > 0) {
+          $_SESSION['kintai']  = mysqli_fetch_assoc($result);
+        }
+      }
+  } 
 ?>
 <!DOCTYPE html>
 <html lang="ja">
