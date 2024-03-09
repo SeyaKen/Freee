@@ -129,7 +129,7 @@
   
   <div style="display:flex;height: 100vh;">
   <?php require "header.php"; ?>
-    <div style="padding: 30px 20px 0; margin: auto;border: 1px solid #dbdbdb;">
+    <div style="margin: auto;border: 1px solid #dbdbdb; padding: 20px 30px;">
       
       <!-- 👇勤怠を記録する画面 -->
       <?php if(!empty($_GET['action']) && $_GET['action'] == 'kintaigamen'):?>
@@ -192,7 +192,7 @@
           </div>
       <?php else:?>
       
-        <div style="height: 300px;display: flex;align-items: center;margin: auto; width: 600px;text-align: center;">
+        <div style="height: 300px;display: flex;align-items: center; width: 470px;justify-content: center;">
           <div style="border-radius: 50%;">
           <?php if(!empty($_SESSION['info']['image'])): ?>
             <img src="<?php echo $_SESSION['info']['image'] ?>" style="border-radius: 50%;height: 150px;object-fit: cover;">

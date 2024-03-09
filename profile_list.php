@@ -45,8 +45,8 @@
             $sou_roudou  = 0;
             if (!empty($kyuuryou_result)) {
               while ($roww = mysqli_fetch_assoc($kyuuryou_result)) {
-                $sou_kyuuryou += $roww['time'];
-                $sou_roudou += $roww['kyuuryou'];
+                $sou_kyuuryou += $roww['kyuuryou'];
+                $sou_roudou += $roww['time'];
               }
             }
             $query = "select kintai from kintai where user_id = '$id'";

@@ -10,7 +10,7 @@
   if($_SERVER['REQUEST_METHOD'] == "POST" && !empty($_POST['action']) && $_POST['action'] == 'real_delete') {
     $id = $_POST['id'];
     $query = "select image from users where id = '$id'";
-    $img = mysqli_query($con, $query);
+    $img = mysqli_fetch_assoc(mysqli_query($con, $query))['image'];
     
     $query = "delete from users where id = '$id'";
     $result = mysqli_query($con, $query);
@@ -20,7 +20,7 @@
     $result = mysqli_query($con, $query);
 
     // 👇退会するときに写真も消す処理
-    if(file_exists($_SESSION['info']['image'])){
+    if(file_exists($img)){
       unlink($img);
     }
 
@@ -225,8 +225,8 @@
       $user_row = mysqli_fetch_assoc($result2);
     ?>
     <div style="margin: 0 auto; width: 650px;">
-    <h2 style="margin: 30px 0 5px 0;">プロフィール</h2>
-      <div style="display:flex;align-items: center;justify-content: space-between;">
+    <h2 style="margin: 30px 0 16px 0;">プロフィール</h2>
+      <div style="display:flex;align-items: center;justify-content: space-between;    background-color: #efefef !important;border-radius: 20px;padding: 20px;">
         <div style="display:flex;align-items: center;">
         <?php if(file_exists($user_row['image'])): ?>
           <img src="<?php echo $user_row['image'] ?>" style="width: 100px; height: 100px;object-fit: cover; border-radius: 50%;margin-right: 20px;">
@@ -258,40 +258,49 @@
 
       
       <!-- 👇給料・労働時間の変更 -->
-      <h2 style="margin: 60px 0 5px 0;">給料・労働時間</h2>
-      <div style="display:flex;align-items: center;justify-content: space-between;">
-        <div style="display:flex;align-items: center;">
-        <?php if(file_exists($user_row['image'])): ?>
-          <img src="<?php echo $user_row['image'] ?>" style="width: 100px; height: 100px;object-fit: cover; border-radius: 50%;margin-right: 20px;">
-        <?php else: ?>
-          <img src="uploads/tokumei.jpeg" style="width: 100%; border-radius: 50%;height: 44px;width: 44px; object-fit:cover;margin-right: 10px;">
+      <h2 style="margin: 60px 0 16px 0;">給料・労働時間</h2>
+      <div style="display:flex;align-items: center;justify-content: space-between;background-color: #efefef !important;border-radius: 20px;padding: 20px;">
+        <?php
+            $id = $_GET['action'];
+            $query = "select * from users where id = '$id' limit 1";
+            $result2 = mysqli_query($con, $query);
+            $user_row = mysqli_fetch_assoc($result2);
+            // 👇給料のデータを持ってくる
+            $query = "select * from kyuuryoujikan where user_id = '$id'";
+            $kyuuryou_result = mysqli_query($con, $query);
+            $sou_kyuuryou = 0;
+            $sou_roudou  = 0;
+            if (!empty($kyuuryou_result)) {
+              while ($roww = mysqli_fetch_assoc($kyuuryou_result)) {
+                $sou_kyuuryou += $roww['time'];
+                $sou_roudou += $roww['kyuuryou'];
+              }
+            }
+            $query = "select kintai from kintai where user_id = '$id'";
+            $kintai_result = mysqli_query($con, $query);
+            $kintai = 0;
+            if (mysqli_num_rows($kintai_result) > 0) {
+              $kintai = mysqli_fetch_assoc($kintai_result)['kintai'];
+            }
+          ?>
+              <div style="display:flex;align-items: center;">
+                
+                <div>
+                  <p style="color: #737373;font-size: 12px;"><?php echo nl2br(htmlspecialchars($user_row['username']));?></p>
+                  <p style="color: #737373;font-size: 12px;">給料（今月）:<?php echo $sou_kyuuryou; ?>円</p>
+                  <p style="color: #737373;font-size: 12px;">労働時間（今月）: <?php echo floor($sou_roudou/60);?>時間</p>
+                </div>
+              </div>
+              
+                  <div style="display:flex;align-items: center;">
+                    <a href="kintai_list.php?id=<?php echo $id; ?>" style="width: 100%;" href="profile.php?action=edit&id=<?php echo $user_row['id'];?>">
+                      <p class="profile-list-button" style="padding: 0 10px;">給料・労働時間の詳細</p>
+                    </a>
+                  </div>
+              </div>
         <?php endif; ?>
-
-          <div>
-            <p style="color: #737373;font-size: 15px;"><?php echo $user_row['email']; ?></p>
-            <p style="color: #737373;font-size: 15px;"><?php echo $user_row['username']; ?></p>
-            <p style="color: #737373;font-size: 15px;">id: <?php echo $user_row['id'];?></p>
-          </div>
-        </div>
-
-        <div style="display: flex; ">
-          <div style="display:flex;align-items: center;margin-right: 10px;">
-            <a style="width: 100%;" href="profile.php?action=edit&id=<?php echo $user_row['id'];?>">
-              <p class="profile-list-button" style="padding: 0 10px;">給料・労働時間を編集</p>
-            </a>
-          </div>
-
-          <div style="display:flex;align-items: center;">
-            <a href="profile.php?action=delete&id=<?php echo $user_row['id'];?>" style="width: 100%;">
-            <p class="profile-list-button" style="padding: 0 10px;background-color:#ed4956;">給料・労働時間を削除</p>
-            </a>
-          </div>
-        </div>
-      </div>
-
     </div>
 
-    <?php endif;?>
   </div>
   <?php require "footer.php"; ?>
   

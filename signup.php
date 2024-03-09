@@ -12,7 +12,11 @@
     // \はKen's Breadなどの「'」を文字列として認識するためのもの
     $email = addslashes($_POST['email']);
     $password = addslashes($_POST['password']);
-    $image = addslashes($_POST['image']);
+    $folder = "uploads/";
+    if(!empty($_FILES['image']['name']) && $_FILES['image']['error'] == 0) {
+      $image = $folder . $_FILES['image']['name'];
+      move_uploaded_file($_FILES['image']['tmp_name'], $image);
+    }
     $date = date('Y-m-d H:i:s');
 
     $query = "insert into users (username, email, password, date, image) values ('$username', '$email', '$password', '$date', '$image')";
