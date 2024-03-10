@@ -80,17 +80,24 @@
     <!-- 👇プロフィール一覧を表示するためのHTML -->
     <!-- <div style="display: flex;margin: 30px 0 20px 0;justify-content: space-between;"> -->
     <h3 style="margin: 30px 0 10px 0;">一覧</h3>
+    <div>
       <?php
         $id = $_GET['id'];
-        $query = "select * from kyuuryoujikan where user_id = '$id'";
+        $query = "select * from kyuuryoujikan where user_id = '$id' order by date";
         // musqli_assocをやるとおかしくなるから$kyuuryou_resultを2個用意
         $kyuuryou_result = mysqli_query($con, $query);
         $kyuuryou_result1 = mysqli_query($con, $query);
+        $nen_check = "";
+        $tuki_check = "";
         if(mysqli_num_rows($kyuuryou_result1) > 0): 
           while($row = mysqli_fetch_assoc($kyuuryou_result1)):
             $kyuuryou_jikan_id = ($row['id']);
             $sou_kyuuryou = 0;
             $sou_roudou  = 0;
+            // if($nen_check == "" && $tuki_check == "") {
+            //   $nen_check = substr($row['date'], 0, 4);
+            //   $tuki_check = substr($row['date'], 5, 2);
+            // }
             if (!empty($kyuuryou_result)) {
               while ($roww = mysqli_fetch_assoc($kyuuryou_result)) {
                 $sou_kyuuryou += $roww['kyuuryou'];
@@ -98,7 +105,12 @@
               }
             }
       ?>
-              <div style="align-items:center;height: 68px;display:flex;justify-content: space-between;padding: 8px 0;">
+        <?php if($nen_check == substr($row['date'], 0, 4) && $tuki_check != substr($row['date'], 5, 2)): ?>
+        <h4 style="padding: 8px 10px;"><?php echo substr($row['date'], 5, 2) ?>月</h4>
+        <?php elseif($nen_check != substr($row['date'], 0, 4)): ?>
+        <h4 style="padding: 8px 10px 0 5px;"><?php echo substr($row['date'], 0, 4) ?>年 <?php echo substr($row['date'], 5, 2) ?>月</h4>
+        <?php endif ?>
+              <div style="align-items:center;height: 68px;display:flex;justify-content: space-between;padding: 8px 10px;border-bottom-width: 1px;border-bottom -color: #dadcdb;border-bottom-style: solid;border-color: #dadcdb;">
                 <div style="display:flex;align-items: center;justify-content: space-between;">
                   <p style="color: #737373;font-size: 12px;margin-right: 20px;"><?php echo $row['date'];?></p>
 
@@ -114,8 +126,14 @@
                   </a>
                 </div>
               </div>
-          <?php endwhile; ?> 
+
+          <?php
+            $nen_check = substr($row['date'], 0, 4);
+            $tuki_check = substr($row['date'], 5, 2);
+            endwhile;
+          ?> 
         <?php endif; ?>
+        </div>
       </div>
     </div>
     <?php endif; ?>

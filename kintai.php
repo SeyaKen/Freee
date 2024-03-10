@@ -195,9 +195,9 @@
         <div style="height: 300px;display: flex;align-items: center; width: 470px;justify-content: center;">
           <div style="border-radius: 50%;">
           <?php if(!empty($_SESSION['info']['image'])): ?>
-            <img src="<?php echo $_SESSION['info']['image'] ?>" style="border-radius: 50%;height: 150px;object-fit: cover;">
+            <img src="<?php echo $_SESSION['info']['image'] ?>" style="border-radius: 50%;height: 150px;width: 150px;object-fit: cover;">
           <?php else: ?>
-            <img src="uploads/tokumei.jpeg" style="border-radius: 50%;height: 150px;object-fit: cover;">
+            <img src="uploads/tokumei.jpeg" style="border-radius: 50%;height: 150px;width: 150px;object-fit: cover;">
           <?php endif; ?>
           </div>
           <div style="margin-left: 50px;">
