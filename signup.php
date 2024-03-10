@@ -13,13 +13,19 @@
     $email = addslashes($_POST['email']);
     $password = addslashes($_POST['password']);
     $folder = "uploads/";
+    $image_upload = false;
     if(!empty($_FILES['image']['name']) && $_FILES['image']['error'] == 0) {
       $image = $folder . $_FILES['image']['name'];
       move_uploaded_file($_FILES['image']['tmp_name'], $image);
+      $image_upload = true;
     }
     $date = date('Y-m-d H:i:s');
 
-    $query = "insert into users (username, email, password, date, image) values ('$username', '$email', '$password', '$date', '$image')";
+    if($image_upload) {
+     $query = "insert into users (username, email, password, date, image) values ('$username', '$email', '$password', '$date', '$image')";
+    } else {
+     $query = "insert into users (username, email, password, date) values ('$username', '$email', '$password', '$date')";
+    }
     
     $result = mysqli_query($con, $query);
     if (!$result) {
@@ -97,7 +103,7 @@
             <button class="button-delete" style="margin-right: 20px;background-color: #0095f6;">保存する</button>
             
           
-            <div style="display:flex;align-items: center;width: 100px">
+            <div style="display:flex;align-items: center;width: 100px;">
               <a href="<?php echo $_SERVER['HTTP_REFERER'];?>" style="width: 100%;">
                 <p class="profile-list-button" style="padding: 0 10px;color: #060606;background-color: #dbdbdb;">キャンセル</p>
               </a>
