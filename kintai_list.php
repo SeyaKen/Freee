@@ -18,6 +18,13 @@
  
     header("Location: kintai_list.php?id=$user_id");
     die;
+  } else if ($_SERVER['REQUEST_METHOD'] == "POST" && !empty($_POST['action']) && $_POST['action'] == 'delete') {
+    $id = $_GET['id'];
+    $user_id = $_GET['user_id'];
+    $query = "delete from kyuuryoujikan where id = '$id' limit 1";
+    mysqli_query($con, $query);
+    header("Location: kintai_list.php?id=$user_id");
+    die;
   }
 ?>
 
@@ -39,6 +46,7 @@
   <?php if(!empty($_GET['action']) && $_GET['action'] == 'edit' && !empty($_GET['id'])):?>
     <?php
       $id = $_GET['id'];
+      $user_id =  $_GET['user_id'];
       $query = "select * from kyuuryoujikan where id = '$id' limit 1";
       $res = mysqli_query($con, $query);
       $kyuuryou_row = mysqli_fetch_assoc($res);
@@ -61,7 +69,53 @@
 
           <div style="display:flex;margin-top: 20px;">
           <button class="button-delete" style="margin-right: 20px;background-color: #0095f6;">保存する</button>
+          <div style="display:flex;align-items: center;width: 100px;margin-right: 20px;">
+            <a href="kintai_list.php?action=delete&id=<?php echo $kyuuryou_row['id'];?>&user_id=<?php echo $user_id?>" style="width: 100%;">
+            <p class="profile-list-button" style="padding: 0 10px;background-color:#ed4956;">削除する</p>
+            </a>
+          </div>
           
+         
+          <div style="display:flex;align-items: center;width: 100px">
+            <a href="<?php echo $_SERVER['HTTP_REFERER'];?>" style="width: 100%;">
+              <p class="profile-list-button" style="padding: 0 10px;color: #060606;background-color: #dbdbdb;">キャンセル</p>
+            </a>
+          </div>
+        </form>
+          
+        </div>
+
+      </div>
+    </div>
+    </div>
+  <!-- 👇給料を消すため？の処理 -->
+  <?php elseif(!empty($_GET['action']) && $_GET['action'] == 'delete' && !empty($_GET['id'])):?>
+    <?php
+      $id = $_GET['id'];
+      $user_id =  $_GET['user_id'];
+      $query = "select * from kyuuryoujikan where id = '$id' limit 1";
+      $res = mysqli_query($con, $query);
+      $kyuuryou_row = mysqli_fetch_assoc($res);
+    ?>
+    <div style="margin: 0 auto; width: 650px;">
+      <h2 style="margin: 30px 0 20px 0;">本当に削除しますか？</h2>
+      <div style="">
+
+        <div style="display:flex;align-items: center;justify-content: space-between;width: 100%;">
+
+        <form method="post" enctype="multipart/form-data">
+          
+          <div style="margin-top:10px;">
+            <h4>給料（円）:</h4><?php echo $kyuuryou_row['kyuuryou'] ?>円</p>
+          </div>
+
+          <div style="margin-top:10px;">
+            <h4>労働時間（分）:</h4><p style="margin: 5px 0;"><?php echo $kyuuryou_row['time'] ?>分</p>
+          </div>
+
+          <div style="display:flex;margin-top: 20px;">
+          <input type="hidden" name="action" value="delete">
+          <button class="button-delete" style="margin-right: 20px;">削除する</button>
          
           <div style="display:flex;align-items: center;width: 100px">
             <a href="<?php echo $_SERVER['HTTP_REFERER'];?>" style="width: 100%;">

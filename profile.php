@@ -229,15 +229,18 @@
       <div style="display:flex;align-items: center;justify-content: space-between;    background-color: #efefef !important;border-radius: 20px;padding: 20px;">
         <div style="display:flex;align-items: center;">
         <?php if(file_exists($user_row['image'])): ?>
-          <img src="<?php echo $user_row['image'] ?>" style="width: 100px; height: 100px;object-fit: cover; border-radius: 50%;margin-right: 20px;">
+          <img src="<?php echo $user_row['image'] ?>" style="width: 100px; height: 100px;object-fit: cover; border-radius: 50%;margin-right: 10px;">
         <?php else: ?>
           <img src="uploads/tokumei.jpeg" style="width: 100%; border-radius: 50%;height: 44px;width: 44px; object-fit:cover;margin-right: 10px;">
         <?php endif; ?>
 
           <div>
-            <p style="color: #737373;font-size: 15px;"><?php echo $user_row['email']; ?></p>
-            <p style="color: #737373;font-size: 15px;"><?php echo $user_row['username']; ?></p>
-            <p style="color: #737373;font-size: 15px;">id: <?php echo $user_row['id'];?></p>
+            <p style="color: #737373;font-size: 13px;"><?php echo $user_row['email']; ?></p>
+            <p style="color: #737373;font-size: 13px;"><?php echo $user_row['username']; ?></p>
+            <p style="color: #737373;font-size: 13px;">id: <?php echo $user_row['id'];?></p>
+            <?php if(($_SESSION['info']['email']) == 'owner@mail.com'): ?>
+            <p><a style="font-size: 13px;color: #1967d2;" href="https://www.kenkemblog.com/">https://www.kenkemblog.com/</a></p>
+            <?php endif; ?>
           </div>
         </div>
         <div style="display: flex; ">
