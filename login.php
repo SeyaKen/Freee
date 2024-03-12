@@ -55,9 +55,6 @@
         }
       ?>
   <div style="height: 100vh;display:flex;">
-  <?php if(!empty($_SESSION['info']['email']) && $_SESSION['info']['email'] == 'owner@mail.com'): ?>
-  <?php require "header.php"; ?>
-  <?php endif; ?> 
     <div style="margin: auto; width: 350px;border: 1px solid #dbdbdb;height: 400px;display: flex; align-items:center;">
 
       
