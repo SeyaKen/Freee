@@ -19,7 +19,6 @@ a {
 
 .main-content {
   display: flex;
-  height: 100vh;
 }
 
 .main-right-content {
@@ -41,6 +40,7 @@ a {
   border-right-width: 1px;
   border-right-color: #dadcdb;
   border-right-style: solid;
+  height: 100vh;
 }
 
 footer{

@@ -21,10 +21,12 @@
     }
     $date = date('Y-m-d H:i:s');
 
+    $jikyuu = $_POST['jikyuu'];
+
     if($image_upload) {
-     $query = "insert into users (username, email, password, date, image) values ('$username', '$email', '$password', '$date', '$image')";
+     $query = "insert into users (username, email, password, date, image, jikyuu) values ('$username', '$email', '$password', '$date', '$image', '$jikyuu')";
     } else {
-     $query = "insert into users (username, email, password, date) values ('$username', '$email', '$password', '$date')";
+     $query = "insert into users (username, email, password, date, jikyuu) values ('$username', '$email', '$password', '$date', '$jikyuu')";
     }
     
     $result = mysqli_query($con, $query);
@@ -92,11 +94,15 @@
             </div>
 
             <div style="margin-top:10px;">
-              <h4>メールアドレス:</h4><input style="margin: 5px 0;" type="text" name="email" placeholder="Email" required>
+              <h4>メールアドレス:</h4><input style="margin: 5px 0;" type="text" name="email" placeholder="メールアドレス" required>
             </div>
 
             <div style="margin-top:10px;">
-              <h4>パスワード:</h4><input style="margin: 5px 0;" type="text" name="password" placeholder="Password" required>
+              <h4>パスワード:</h4><input style="margin: 5px 0;" type="text" name="password" placeholder="パスワード" required>
+            </div>
+
+            <div style="margin-top:10px;">
+              <h4>時給:</h4><input style="margin: 5px 0;" type="number" name="jikyuu" placeholder="時給" required>
             </div>
 
             <div style="display:flex;margin-top: 20px;">

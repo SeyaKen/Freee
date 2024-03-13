@@ -32,6 +32,8 @@
   {
     $id = $_POST['id'];
     $image_added = false;
+    
+
     if(!empty($_FILES['image']['name']) && $_FILES['image']['error'] == 0) {
       // echo $_FILES['image']['name'];die;
       // file was uploaded
@@ -54,10 +56,13 @@
     $email = addslashes($_POST['email']);
     $password = addslashes($_POST['password']);
 
+    $jikyuu = $_POST['jikyuu'];
+    // print_r($jikyuu);die;
+
     if($image_added == true) {
-      $query = "update users set username = '$username', email = '$email', password = '$password', image = '$image' where id = '$id' limit 1 ";
+      $query = "update users set username = '$username', email = '$email', password = '$password', image = '$image', jikyuu = '$jikyuu' where id = '$id' limit 1 ";
     } else {
-      $query = "update users set username = '$username', email = '$email', password = '$password' where id = '$id' limit 1 ";
+      $query = "update users set username = '$username', email = '$email', password = '$password', jikyuu = '$jikyuu' where id = '$id' limit 1 ";
     }
 
     $result = mysqli_query($con, $query);
@@ -154,6 +159,10 @@
             <h4>パスワード:</h4><input style="margin: 5px 0;" value="<?php echo $user_row['password'] ?>" type="text" name="password" placeholder="Password" required>
           </div>
 
+          <div style="margin-top:10px;">
+            <h4>時給:</h4><input style="margin: 5px 0;" value="<?php echo $user_row['jikyuu'] ?>" type="number" name="jikyuu" placeholder="時給" required>
+          </div>
+
           <div style="display:flex;margin-top: 20px;">
           <button class="button-delete" style="margin-right: 20px;background-color: #0095f6;">保存する</button>
           
@@ -238,7 +247,7 @@
             <p style="color: #737373;font-size: 13px;"><?php echo $user_row['email']; ?></p>
             <p style="color: #737373;font-size: 13px;"><?php echo $user_row['username']; ?></p>
             <p style="color: #737373;font-size: 13px;">id: <?php echo $user_row['id'];?></p>
-            <?php if(($_SESSION['info']['email']) == 'owner@mail.com'): ?>
+            <?php if($user_row['email'] == 'owner@mail.com'): ?>
             <p><a style="font-size: 13px;color: #1967d2;" href="https://www.kenkemblog.com/">https://www.kenkemblog.com/</a></p>
             <?php endif; ?>
           </div>

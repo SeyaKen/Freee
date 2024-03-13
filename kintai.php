@@ -63,7 +63,7 @@
       // $InTime = $Date."01:00:00";
       $InTime = $Date.substr($_SESSION['kintai']['time'], 11, 8);
       $OutTime = $Date.substr($time, 11, 8);
-      $roudouhun = floor((strtotime($OutTime) - strtotime($InTime))/60);
+      $roudouhun = floor((strtotime($OutTime) - strtotime($InTime) - $_POST['kyuukei_time']  * 60)/60);
       $kyuuryou = floor($roudouhun * 1113/60);
     } else {
       $Date = date('Y-m-d', strtotime('-1 day'));
@@ -71,7 +71,7 @@
       // $InTime = $Date1."21:00:00";
       $InTime = $Date.substr($_SESSION['kintai']['time'], 11, 8);
       $OutTime = $Date2.substr($time, 11, 8);
-      $roudouhun = floor((strtotime($OutTime) - strtotime($InTime))/60);
+      $roudouhun = floor((strtotime($OutTime) - strtotime($InTime) - $_POST['kyuukei_time'] * 60)/60);
       $kyuuryou = floor($roudouhun * 1113/60);
     }
 
@@ -133,14 +133,14 @@
       
       <!-- 👇勤怠を記録する画面 -->
       <?php if(!empty($_GET['action']) && $_GET['action'] == 'kintaigamen'):?>
-        <h2 style="text-align: center;margin-bottom: 30px;">
+        <p style="margin-left: 10px;">
         <?php if(!empty($_SESSION['kintai']['kintai']) && $_SESSION['kintai']['kintai']){
-            echo "退勤する";
+            echo "退勤時間";
           } else {
-            echo "出勤する";
+            echo "出勤時間";
           }
         ?>
-        </h2>
+        </p>
           <form method="post" enctype="multipart/form-data" style="margin: auto; pading: 10px;">
 
             <input value="<?= $today = date("Y-m-d H:i:s");?>" type="text" name="time" placeholder="勤怠時間" required><br>
@@ -152,6 +152,11 @@
                       echo "shukkin";
                     }
                   ?>>
+
+            <?php if(!empty($_SESSION['kintai']['kintai']) && $_SESSION['kintai']['kintai']): ?>
+              <p style="margin-left: 10px;margin-top: 10px;">休憩時間（分）</p>
+            <input value="0" type="int" name="kyuukei_time" placeholder="休憩時間" required><br>
+            <?php endif ?>          
 
             <div class="kintai-bottom-button" style="margin: 30px auto; width: 250px;">
               <div>
