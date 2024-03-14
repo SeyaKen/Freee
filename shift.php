@@ -13,7 +13,9 @@
     $query = "select shift from users where id = '$id'";
     $result = mysqli_query($con, $query);
     $row = mysqli_fetch_assoc($result);
-    $shift = json_decode($row['shift'], true);
+    if(!empty($row['shift'])){
+      $shift = json_decode($row['shift'], true);
+    }
     if(empty($row['shift'])) {
       $shift = array($_GET['year']."-".$_GET['day'] => array("01" => $_POST['time1'], "02" => $_POST['time2']));
     } else if(!empty($shift[$_GET['year']."-".$_GET['day']])) {
@@ -95,11 +97,13 @@
 
           <div style="display:flex;margin-top: 20px;">
           <button class="button-delete" style="margin-right: 20px;background-color: #0095f6;">保存する</button>
-          <div style="display:flex;align-items: center;width: 100px;margin-right: 20px;">
-            <a href="shift.php?action=delete&id=<?php echo $_GET['id'];?>&hinichi_id=<?php echo $_GET['year']."-".$_GET['day'];?>" style="width: 100%;">
-            <p class="profile-list-button" style="padding: 0 10px;background-color:#ed4956;">削除する</p>
-            </a>
-          </div>
+            <?php if(!empty($_GET["end"])){ ?>
+              <div style="display:flex;align-items: center;width: 100px;margin-right: 20px;">
+              <a href="shift.php?action=delete&id=<?php echo $_GET['id'];?>&hinichi_id=<?php echo $_GET['year']."-".$_GET['day'];?>" style="width: 100%;">
+              <p class="profile-list-button" style="padding: 0 10px;background-color:#ed4956;">削除する</p>
+              </a>
+            </div>
+          <?php } ?>
           
          
           <div style="display:flex;align-items: center;width: 100px">
@@ -210,7 +214,7 @@
         }
         while($count <= $count0){
       ?>
-        <th style="font-size: 12px;border-right: 1px solid #eee;width: 35px;"><?php
+        <th style="font-size: 12px;border-right: 1px solid #eee;width: 35px;height: 0;"><?php
         if($_GET["zenkouhan"] == "zenhan") {
           echo $count+15;
         } else {
@@ -249,19 +253,20 @@
               $sonohi = $this_month."-".$count1;
             }
           }
-          // echo json_decode($table['shift'], true)[$sonohi]["01"];die;
-          $json_for_display = json_decode($table['shift'], true);
+          if(!empty($table['shift'])){
+            $json_for_display = json_decode($table['shift'], true);
+          }
         ?>
-        <?php if($_SESSION['info']['email'] == "ower@mail.com" && !empty($table['shift']) && !empty($json_for_display[$sonohi])) :?>
-          <a style="text-align:center;font-size: 12px;width: 100%;height: 100%;display:block;" href="shift.php?action=edit&id=<?php echo $table['id']; ?>&day=<?php
+        <?php if($_SESSION['info']['email'] == "owner@mail.com" && !empty($table['shift']) && !empty($json_for_display[$sonohi])) :?>
+          <a style="text-align:center;font-size: 12px;width: 100%;height: 100%;display:block;color:#1967d2;" href="shift.php?action=edit&id=<?php echo $table['id']; ?>&day=<?php
              if($_GET["zenkouhan"] == "zenhan"){
               echo $count1+15;
              } else {
               if($count1 < 10) {echo "0".$count1;} else {echo $count1;} 
              }
           ?>&year=<?php echo $this_month ?>&start=<?php echo $json_for_display[$sonohi]["01"] ?>&end=<?php echo $json_for_display[$sonohi]["02"] ?>">
-        <?php else: ?>
-          <a style="text-align:center;font-size: 12px;width: 100%;height: 100%;display:block;" href="shift.php?action=edit&id=<?php echo $table['id']; ?>&day=<?php 
+        <?php elseif($_SESSION['info']['email'] == "owner@mail.com"): ?>
+          <a style="text-align:center;font-size: 12px;width: 100%;height: 100%;display:block;color:#1967d2;" href="shift.php?action=edit&id=<?php echo $table['id']; ?>&day=<?php 
             if($_GET["zenkouhan"] == "zenhan"){
               echo $count1+15;
              } else {
@@ -269,11 +274,13 @@
              }
           ?>&year=<?php echo $this_month ?>">
         <?php endif ?>
+        <span style="text-align:center;font-size: 12px;display:block;">
           <?php 
             if(!empty($table['shift']) && !empty($json_for_display[$sonohi])) {
               echo $json_for_display[$sonohi]["01"]."<br>"."~"."<br>".$json_for_display[$sonohi]["02"];
             }
           ?>
+          </span>
           </a>
         </td>
       <?php 
@@ -316,7 +323,7 @@
         $count = 1;
         while($count < 16){
       ?>
-        <th style="font-size: 12px;border-right: 1px solid #eee;width: 35px;"><?php echo $count ?></th>
+        <th style="font-size: 12px;border-right: 1px solid #eee;width: 35px;height: 0;"><?php echo $count ?></th>
       <?php 
         $count++; } 
       ?>
@@ -339,18 +346,23 @@
             $sonohi = "2024-03-".$count1;
           }
           // echo json_decode($table['shift'], true)[$sonohi]["01"];die;
-          $json_for_display = json_decode($table['shift'], true);
+          if(!empty($table['shift'])){
+            $json_for_display = json_decode($table['shift'], true);
+          }
         ?>
-        <?php if($_SESSION['info']['email'] == "ower@mail.com" && !empty($table['shift']) && !empty($json_for_display[$sonohi])) :?>
-          <a style="text-align:center;font-size: 12px;width: 100%;height: 100%;display:block;" href="shift.php?action=edit&id=<?php echo $table['id']; ?>&day=<?php if($count1 < 10) {echo "0".$count1;} else {echo $count1;} ?>&year=<?php echo date("Y-m") ?>&start=<?php echo $json_for_display[$sonohi]["01"] ?>&end=<?php echo $json_for_display[$sonohi]["02"] ?>">
-        <?php else: ?>
-          <a style="text-align:center;font-size: 12px;width: 100%;height: 100%;display:block;" href="shift.php?action=edit&id=<?php echo $table['id']; ?>&day=<?php if($count1 < 10) {echo "0".$count1;} else {echo $count1;} ?>&year=<?php echo date("Y-m") ?>">
+        <?php if($_SESSION['info']['email'] == "owner@mail.com" && !empty($table['shift']) && !empty($json_for_display[$sonohi])) :?>
+          <a style="text-align:center;font-size: 12px;width: 100%;height: 100%;display:block;color:#1967d2;" 
+          href="shift.php?action=edit&id=<?php echo $table['id']; ?>&day=<?php if($count1 < 10) {echo "0".$count1;} else {echo $count1;} ?>&year=<?php echo date("Y-m") ?>&start=<?php echo $json_for_display[$sonohi]["01"] ?>&end=<?php echo $json_for_display[$sonohi]["02"]?>">
+        <?php elseif($_SESSION['info']['email'] == "owner@mail.com"): ?>
+          <a style="text-align:center;font-size: 12px;width: 100%;height: 100%;display:block;color:#1967d2;" href="shift.php?action=edit&id=<?php echo $table['id']; ?>&day=<?php if($count1 < 10) {echo "0".$count1;} else {echo $count1;} ?>&year=<?php echo date("Y-m") ?>">
         <?php endif ?>
+        <span style="text-align:center;font-size: 12px;display:block;">
           <?php 
             if(!empty($table['shift']) && !empty($json_for_display[$sonohi])) {
               echo $json_for_display[$sonohi]["01"]."<br>"."~"."<br>".$json_for_display[$sonohi]["02"];
             }
           ?>
+          </span>
           </a>
         </td>
       <?php 
