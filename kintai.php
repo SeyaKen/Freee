@@ -51,7 +51,6 @@
     $name = $_SESSION['kintai']['name'];
     $nyuukintime = $_SESSION['kintai']['time'];
     $time = $_POST['time'];
-    // $time = "2024-03-06 11:13:20";
 
     $roudouhun;
     $kyuuryou;
@@ -64,7 +63,6 @@
       $InTime = $Date.substr($_SESSION['kintai']['time'], 11, 8);
       $OutTime = $Date.substr($time, 11, 8);
       $roudouhun = floor((strtotime($OutTime) - strtotime($InTime) - $_POST['kyuukei_time']  * 60)/60);
-      $kyuuryou = floor($roudouhun * 1113/60);
     } else {
       $Date = date('Y-m-d', strtotime('-1 day'));
       $Date2 = date("Y-m-d");
@@ -72,14 +70,18 @@
       $InTime = $Date.substr($_SESSION['kintai']['time'], 11, 8);
       $OutTime = $Date2.substr($time, 11, 8);
       $roudouhun = floor((strtotime($OutTime) - strtotime($InTime) - $_POST['kyuukei_time'] * 60)/60);
-      $kyuuryou = floor($roudouhun * 1113/60);
     }
+
+    // 給料とその月の合計労働時間をkyuuroujikanテーブルに入れる処理
+    $query = "select jikyuu from users where id = '$user_id'";
+    $result = mysqli_query($con, $query);
+    $jikyuu = mysqli_fetch_assoc($result)['jikyuu'];
+
+    $kyuuryou = floor($roudouhun * $jikyuu / 60);
 
     // 給料とその月の合計労働時間をkyuuroujikanテーブルに入れる処理
     $query = "insert into kyuuryoujikan (user_id, time, kyuuryou, name, date) value ('$user_id', '$roudouhun', '$kyuuryou', '$name', '$Date') ";
     $result = mysqli_query($con, $query);
-    
-    
     
     //👇退勤の最終的な処理 
     $query = "update kintai set user_id = '$user_id', kintai = 0, name = '$name', time = '$time' where id = '$id' && user_id = '$user_id' && time = '$nyuukintime' limit 1";
