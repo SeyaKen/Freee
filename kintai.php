@@ -57,19 +57,29 @@
     $Date;
     // 日付が変わっているかどうか
     if(substr($time, 8, 2) == substr($_SESSION['kintai']['time'], 8, 2)) {
-      
       $Date = date("Y-m-d");
-      // $InTime = $Date."01:00:00";
-      $InTime = $Date.substr($_SESSION['kintai']['time'], 11, 8);
-      $OutTime = $Date.substr($time, 11, 8);
-      $roudouhun = floor((strtotime($OutTime) - strtotime($InTime) - $_POST['kyuukei_time']  * 60)/60);
+
+      // $_SESSION['kintai']['time'] から時間を取得して $InTime を作成
+      $InTime = $Date . substr($_SESSION['kintai']['time'], 10, 9);
+
+      // $time から時間を取得して $OutTime を作成
+      $OutTime = $Date . substr($time, 10, 9);
+
+      // 労働時間を計算
+      $roudouhun = floor((strtotime($OutTime) - strtotime($InTime) - ($_POST['kyuukei_time'] * 60)) / 60);
     } else {
       $Date = date('Y-m-d', strtotime('-1 day'));
       $Date2 = date("Y-m-d");
-      // $InTime = $Date1."21:00:00";
-      $InTime = $Date.substr($_SESSION['kintai']['time'], 11, 8);
-      $OutTime = $Date2.substr($time, 11, 8);
-      $roudouhun = floor((strtotime($OutTime) - strtotime($InTime) - $_POST['kyuukei_time'] * 60)/60);
+        
+      $InTime = $Date . substr($_SESSION['kintai']['time'], 10, 9);
+      $OutTime = $Date2 . substr($time, 10, 9);
+        
+      // 両方のタイムスタンプに日付を含める
+      $InTime = strtotime($InTime);
+      $OutTime = strtotime($OutTime);
+        
+      // 労働時間を計算する
+      $roudouhun = floor(($OutTime - $InTime - ($_POST['kyuukei_time'] * 60)) / 60);
     }
 
     // 給料とその月の合計労働時間をkyuuroujikanテーブルに入れる処理

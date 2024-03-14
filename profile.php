@@ -20,7 +20,7 @@
     $result = mysqli_query($con, $query);
 
     // 👇退会するときに写真も消す処理
-    if(file_exists($img)){
+    if(file_exists($img) && $img != "uploads/tokumei.jpeg"){
       unlink($img);
     }
 
